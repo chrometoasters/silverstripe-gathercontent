@@ -1,0 +1,34 @@
+---
+Name: silverstripe-gathercontent
+---
+SSGatherContent:
+  api:
+    url: "https://api.gathercontent.com/"
+    username:
+    key:
+
+  plugin_api:
+    url: "https://%%ACCOUNTNAME%%.gathercontent.com/api/0.4/"
+    accountname:
+    key:
+    password: x
+
+  project:
+
+  assets_folder: gathercontent
+  save_json_files: false
+  use_saved_json_files: false
+  update_existing: true
+  allow_publish: false
+
+  processors:
+    field:
+    value:
+
+  mappings:
+    classes:
+
+  statuses:
+    skip:
+    draft:
+    publish:
