@@ -22,32 +22,43 @@ class SSGatherContentTools extends Object {
      * @param array $params         POST data to be passed through to the endpoint
      * @return array                array containing response and http code returned by curl
      */
-    public static function fetchAPI($url, $httpHeader, $userPwd, $params = []) {
+    public static function fetchAPI($url, $httpHeader, $userPwd, $params = [], $pluginAPI = false) {
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeader);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
-        curl_setopt($ch, CURLOPT_USERPWD, $userPwd);
-        if (substr($url, 0, 8) == 'https://') {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        try {
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeader);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERPWD, $userPwd);
+            if (substr($url, 0, 8) == 'https://') {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            }
+            if (!empty($params)) {
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+            }
+
+            if ($pluginAPI) {
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+            } else {
+                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            }
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            return [
+                'code' => (int)$httpCode,
+                'response' => $response,
+            ];
+
+        } catch (Exception $e) {
+            return false;
         }
-        if (!empty($params)) {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-        }
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        return [
-            'code' => $httpCode,
-            'response' => $response,
-        ];
-
     }
 
 }
