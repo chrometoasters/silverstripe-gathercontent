@@ -103,4 +103,51 @@ class SSGatherContentTools extends Object {
 
     }
 
+
+    /**
+     * Find unique file name by adding _1, _2 etc. if input or previous generated filename exists
+     *
+     * @param string $path              absolute file path with trailing slash
+     * @param string $filename          filename to be checked
+     * @return string                   unique filename within given path
+     */
+    private static function findUniqueFilename($path, $filename) {
+        $i = 1;
+        $path_parts = pathinfo($path . $filename);
+        $ext = $path_parts['extension'];
+        $fname = $path_parts['filename'];
+
+        while (file_exists($path . $filename)) {
+            $filename = $fname . "_$i.$ext";
+            $i++;
+        }
+        return $filename;
+    }
+
+
+    /**
+     * Create given destination folder for a potential file, optionally generating unique filename
+     * and return all details in an associative array
+     *
+     * @param string $path              absolute file path with trailing slash
+     * @param string $filename          filename to be created/checked
+     * @param bool $createUnique        determine whether to create/check unique filename or not
+     * @return array                    path and file details
+     */
+    private static function getFolderAndUniqueFilename($path, $filename, $createUnique) {
+        // get or create destination folder under assets folder
+        $folder = Folder::find_or_make($path);
+
+        // determine final file name, overwrite by default
+        $destFilename = $filename;
+        if ($createUnique) {
+            $destFilename = self::findUniqueFilename($folder->getFullPath(), $filename);
+        }
+
+        // compose full absolute path
+        $fullPath = $folder->getFullPath() . $destFilename;
+
+        return ['folder' => $folder, 'filename' => $destFilename, 'fullPath' => $fullPath];
+    }
+
 }
