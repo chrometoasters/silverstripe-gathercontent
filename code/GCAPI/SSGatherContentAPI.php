@@ -197,8 +197,8 @@ class SSGatherContentAPI {
      * Retrieve all files belonging to a particular Item
      * https://gathercontent.com/support/developer-api/ see 5.Files
      */
-    public function getFilesByPage($page_id) {
-        $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $page_id], 'files');
+    public function getFilesByItem($item_id) {
+        $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
         return $data;
     }
 
