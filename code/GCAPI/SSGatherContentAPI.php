@@ -55,7 +55,8 @@ class SSGatherContentAPI {
      * https://gathercontent.com/developers/me/
      */
     public function getMe() {
-        return $this->gcAPI->readAPI('me');
+        $data = $this->gcAPI->readAPI('me');
+        return $data;
     }
 
 
@@ -64,7 +65,8 @@ class SSGatherContentAPI {
      * https://gathercontent.com/developers/accounts/get-accounts/
      */
     public function getAccounts() {
-        return $this->gcAPI->readAPI('accounts');
+        $data = $this->gcAPI->readAPI('accounts');
+        return $data;
     }
 
 
@@ -77,7 +79,8 @@ class SSGatherContentAPI {
      */
     public function getProjects($account_id) {
         $method = 'projects?account_id=' . intval($account_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -90,7 +93,8 @@ class SSGatherContentAPI {
      */
     public function getProject($project_id) {
         $method = 'projects/' . intval($project_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -103,7 +107,8 @@ class SSGatherContentAPI {
      */
     public function getItems($project_id) {
         $method = 'items?project_id=' . intval($project_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -116,7 +121,8 @@ class SSGatherContentAPI {
      */
     public function getItem($item_id) {
         $method = 'items/' . intval($item_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -129,7 +135,8 @@ class SSGatherContentAPI {
      */
     public function getTemplates($project_id) {
         $method = 'templates?project_id=' . intval($project_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -142,7 +149,8 @@ class SSGatherContentAPI {
      */
     public function getTemplate($template_id) {
         $method = 'templates/' . intval($template_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -155,7 +163,8 @@ class SSGatherContentAPI {
      */
     public function getStatuses($project_id) {
         $method = 'projects/' . intval($project_id) . '/statuses';
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -169,7 +178,8 @@ class SSGatherContentAPI {
      */
     public function getStatus($project_id, $status_id) {
         $method = 'projects/' . intval($project_id) . '/statuses/' . intval($status_id);
-        return $this->gcAPI->readAPI($method);
+        $data = $this->gcAPI->readAPI($method);
+        return $data;
     }
 
 
@@ -178,7 +188,8 @@ class SSGatherContentAPI {
      * https://gathercontent.com/support/developer-api/ see 5.Files
      */
     public function getFilesByProject($project_id) {
-        return $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
+        $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
+        return $data;
     }
 
 
@@ -187,7 +198,8 @@ class SSGatherContentAPI {
      * https://gathercontent.com/support/developer-api/ see 5.Files
      */
     public function getFilesByPage($page_id) {
-        return $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $page_id], 'files');
+        $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $page_id], 'files');
+        return $data;
     }
 
 
@@ -196,7 +208,8 @@ class SSGatherContentAPI {
      * https://gathercontent.com/support/developer-api/ see 5.Files
      */
     public function getFile($file_id) {
-        return $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        return $data;
     }
 
 }
