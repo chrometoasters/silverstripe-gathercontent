@@ -159,6 +159,14 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Holder for an instance of GatherContent API class
+     *
+     * @var SSGatherContentAPI
+     */
+    private $gcAPI;
+
+
+    /**
      * Module's main class constructor
      *
      * Checking for essential settings
@@ -199,50 +207,14 @@ class SSGatherContent extends Object {
         }
         Config::inst()->update('SSGatherContent', 'plugin_api', $pluginApiCfg);
 
-    }
 
+        // instantiate and assign SS GC API
+        $this->gcAPI = new SSGatherContentAPI($this->cfg);
 
-    /**
-     * Request data from GatherContent using new API and return array containing response data and http code
-     * as returned by curl
-     *
-     * If some parameters are provided via $params, the call uses POST instead of GET and the data is passed through.
-     *
-     *
-     * @param string $method        part of the url to be added to the API url to make specific calls
-     * @param array $params         POST data to be passed through to the endpoint
-     * @return array                array containing response and http code returned by curl
-     */
-    private function callAPI($method = '', $params = []) {
-
-        $url = $this->cfg->api['url'] . $method;
-        $httpHeader = ['Accept: application/vnd.gathercontent.v0.5+json'];
-        $userPwd = $this->cfg->api['username'] . ':' . $this->cfg->api['key'];
-
-        return SSGatherContentTools::fetchAPI($url, $httpHeader, $userPwd, $params);
 
     }
 
 
-    /**
-     * Request data from GatherContent using legacy plugin API and return array containing response data and http code
-     * as returned by curl
-     *
-     * If some parameters are provided via $params, the call uses POST instead of GET and the data is passed through
-     *
-     * @param string $method        part of the url to be added to the API url to make specific calls (endpoint)
-     * @param array $params         POST data to be passed through to the endpoint
-     * @return array                array containing response and http code returned by curl
-     */
-    private function callPluginAPI($method = '', $params = []) {
-
-        $url = $this->cfg->plugin_api['url'] . $method;
-        $httpHeader = ['Accept: application/json', 'Content-Type: application/x-www-form-urlencoded'];
-        $userPwd = $this->cfg->plugin_api['key'] . ":" . $this->cfg->plugin_api['password'];
-
-        return SSGatherContentTools::fetchAPI($url, $httpHeader, $userPwd, $params);
-
-    }
 
 
 }
