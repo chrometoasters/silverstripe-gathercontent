@@ -150,4 +150,36 @@ class SSGatherContentTools extends Object {
         return ['folder' => $folder, 'filename' => $destFilename, 'fullPath' => $fullPath];
     }
 
+
+    /**
+     * Download file from GatherContent S3 storage, save it under given assets folder (either overwriting existing or creating unique filename)
+     * and in case of success, generate File object in the CMS and return its ID
+     *
+     * @param string $S3FileStoreUrl        GC S3 url with trailing slash
+     * @param string $S3FileIdentifier      GC S3 file identifier obtained from the API call
+     * @param string $assetsSubfolder       subfolder under assets folder where to store downloaded file
+     * @param string $filename              original filename used when uploading to GC under which the file is stored (if overwriteFiles is false, could be unique variation)
+     * @param bool $overwriteFiles          overwrite already existing files? if false, unique filename is generated if file already exists
+     * @return bool|int                     ID of File within the cms OR false in case of failure
+     */
+    public static function downloadFileIntoAssetsFolder($S3FileStoreUrl, $S3FileIdentifier, $assetsSubfolder, $filename, $overwriteFiles) {
+
+        // get destination storage
+        $store = self::getFolderAndUniqueFilename($assetsSubfolder, $filename, !$overwriteFiles);
+        $folder = $store['folder'];
+
+        // compose S3 url for download
+        $S3Url = $S3FileStoreUrl . $S3FileIdentifier;
+
+        // fetch the file
+        $res = self::downloadFileFromS3($S3Url, $store['fullPath']);
+
+        // if downloaded successfully, update CMS db and return ID of the file
+        if ($res && $res['response'] && ($res['code'] === 200)) {
+            return $folder->constructChild($store['filename']);
+        } else {
+            return false;
+        }
+    }
+
 }
