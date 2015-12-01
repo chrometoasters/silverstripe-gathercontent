@@ -59,6 +59,48 @@ class SSGatherContentTools extends Object {
         } catch (Exception $e) {
             return false;
         }
+
+    }
+
+
+    /**
+     * Download file from GatherContent and store it under given filename (including full absolute path)
+     *
+     * @param string $S3Url             url to be downloaded
+     * @param string $assetsFilename    absolute path to a file
+     * @return array|bool               array containing response and http code returned by curl
+     */
+    public static function downloadFileFromS3($S3Url, $assetsFilename) {
+
+        try {
+
+            set_time_limit(0);
+            $fp = fopen($assetsFilename, 'w');
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $S3Url);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_FILE, $fp); // write curl response to file
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            if (substr($S3Url, 0, 8) == 'https://') {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            }
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            curl_close($ch);
+            fclose($fp);
+
+            return [
+                'code' => (int)$httpCode,
+                'response' => $response,
+            ];
+
+        } catch (Exception $e) {
+            return false;
+        }
+
     }
 
 }
