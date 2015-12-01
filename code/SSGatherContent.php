@@ -14,6 +14,7 @@ class SSGatherContent extends Object {
      * - username
      * - key
      *
+     * @var array
      * @config
      */
     private static $api = [];
@@ -26,6 +27,7 @@ class SSGatherContent extends Object {
      * - key
      * - password
      *
+     * @var array
      * @config
      */
     private static $plugin_api = [];
@@ -34,6 +36,7 @@ class SSGatherContent extends Object {
     /**
      * GatherContent project name
      *
+     * @var string
      * @config
      */
     private static $project = '';
@@ -61,6 +64,7 @@ class SSGatherContent extends Object {
      * Assets folder used to store downloaded JSON data
      * if $save_json_files is true
      *
+     * @var string
      * @config
      */
     private static $assets_subfolder_json = '';
@@ -69,6 +73,7 @@ class SSGatherContent extends Object {
     /**
      * Determine whether JSON data is saved when downloaded from GatherContent
      *
+     * @var bool
      * @config
      */
     private static $save_json_files;
@@ -78,6 +83,7 @@ class SSGatherContent extends Object {
      * Determine whether to use JSON data files for items no longer referenced
      * by GatherContent, but possibly still valid for the project
      *
+     * @var bool
      * @config
      */
     private static $use_saved_json_files;
@@ -87,6 +93,7 @@ class SSGatherContent extends Object {
      * Determine whether to overwrite existing CMS items by items from GatherContent,
      * based on GatherContent unique item id
      *
+     * @var bool
      * @config
      */
     private static $update_existing;
@@ -105,6 +112,7 @@ class SSGatherContent extends Object {
     /**
      * Determine whether to directly publish items that have status allowing them to be published in the CMS
      *
+     * @var bool
      * @config
      */
     private static $allow_publish;
@@ -114,6 +122,7 @@ class SSGatherContent extends Object {
      * Holder for various attributes and values processors, e.g. for removing prefix
      * from field name or other strings and values magic
      *
+     * @var array
      * @config
      */
     private static $processors = [];
@@ -122,6 +131,7 @@ class SSGatherContent extends Object {
     /**
      * Holder for mappings between CMS page types, data objects and their attributes and fields AND GatherContent items
      *
+     * @var array
      * @config
      */
     private static $mappings = [];
@@ -133,6 +143,7 @@ class SSGatherContent extends Object {
      * - draft (items created as draft items, not published)
      * - publish (items published in the CMS, if settings allow)
      *
+     * @var array
      * @config
      */
     private static $statuses = [];
@@ -141,7 +152,7 @@ class SSGatherContent extends Object {
     /**
      * Shortcut to current config object, loaded in constructor
      *
-     * @var
+     * @var Config_ForClass|null
      */
     private $cfg;
 
