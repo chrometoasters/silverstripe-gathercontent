@@ -72,6 +72,7 @@ class SSGatherContent extends Object {
 
     /**
      * Determine whether JSON data is saved when downloaded from GatherContent
+     * If the file exists for given API call, it's always replaced by the new one
      *
      * @var bool
      * @config
@@ -80,7 +81,7 @@ class SSGatherContent extends Object {
 
 
     /**
-     * Determine whether to use JSON data files for items no longer referenced
+     * Determine whether to use JSON data files for Items no longer referenced
      * by GatherContent, but possibly still valid for the project
      *
      * @var bool
@@ -180,7 +181,7 @@ class SSGatherContent extends Object {
 
 
         $apiCfg = $this->cfg->api; // need to go via a variable to be able to assign back to the config object
-        // check for trailing slashes in api url and add it if missing
+        // check for trailing slashes in the API url and add it if missing
         if (substr($apiCfg['url'], -1, 1) !== '/') {
             $apiCfg['url'] .= '/';
         }
@@ -188,7 +189,7 @@ class SSGatherContent extends Object {
 
 
         $pluginApiCfg = $this->cfg->plugin_api; // need to go via a variable to be able to assign back to the config object
-        // check for trailing slashes in plugin api url and add it if missing
+        // check for trailing slashes in the plugin API url and add it if missing
         if (substr($pluginApiCfg['url'], -1, 1) !== '/') {
             $pluginApiCfg['url'] .= '/';
         }
