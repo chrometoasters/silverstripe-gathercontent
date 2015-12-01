@@ -15,10 +15,13 @@ SSGatherContent:
 
   project:
 
-  assets_folder: gathercontent
+  s3_file_store_url: https://gathercontent.s3.amazonaws.com/
+  assets_subfolder: gathercontent
+  assets_subfolder_json: gathercontent_json
   save_json_files: false
   use_saved_json_files: false
   update_existing: true
+  overwrite_files: false
   allow_publish: false
 
   processors:

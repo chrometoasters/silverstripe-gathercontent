@@ -40,12 +40,30 @@ class SSGatherContent extends Object {
 
 
     /**
+     * GatherContent S3 file store URL
+     *
+     * @var string
+     * @config
+     */
+    private static $s3_file_store_url;
+
+
+    /**
+     * Folder under CMS assets folder used to store downloaded files
+     *
+     * @var string
+     * @config
+     */
+    private static $assets_subfolder = '';
+
+
+    /**
      * Assets folder used to store downloaded JSON data
      * if $save_json_files is true
      *
      * @config
      */
-    private static $assets_folder;
+    private static $assets_subfolder_json = '';
 
 
     /**
@@ -72,6 +90,16 @@ class SSGatherContent extends Object {
      * @config
      */
     private static $update_existing;
+
+
+    /**
+     * Determine whether to overwrite existing files under assets by files downloaded from GatherContent.
+     * If we're not overwriting, index _1, _2 etc. will be added until found non-existing filename
+     *
+     * @var bool
+     * @config
+     */
+    private static $overwrite_files;
 
 
     /**
