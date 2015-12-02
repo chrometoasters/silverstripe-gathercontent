@@ -71,6 +71,24 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Assets folder used to store downloaded JSON data as a backup
+     *
+     * @var string
+     * @config
+     */
+    private static $assets_subfolder_backup = '';
+
+
+    /**
+     * Determine whether to create a backup subfolder based on date and time of the backup
+     *
+     * @var bool
+     * @config
+     */
+    private static $suffix_backup_with_datetime;
+
+
+    /**
      * Determine whether JSON data is saved when downloaded from GatherContent
      * If the file exists for given API call, it's always replaced by the new one
      *

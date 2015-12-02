@@ -18,6 +18,8 @@ SSGatherContent:
   s3_file_store_url: https://gathercontent.s3.amazonaws.com/
   assets_subfolder: gathercontent
   assets_subfolder_json: gathercontent_json
+  assets_subfolder_backup: "gathercontent/backup"
+  suffix_backup_with_datetime: true
   save_json_files: false
   use_saved_json_files: false
   update_existing: true
