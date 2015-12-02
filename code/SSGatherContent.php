@@ -226,6 +226,19 @@ class SSGatherContent extends Object {
         Config::inst()->update('SSGatherContent', 'plugin_api', $pluginApiCfg);
 
 
+        // ensure all folders are configured before they're used
+        if (!trim($this->cfg->assets_subfolder)) {
+            throw new Exception('Assets subfolder for downloaded files has to be configured.');
+        }
+        if (!trim($this->cfg->assets_subfolder_backup)) {
+            throw new Exception('Assets subfolder for backups has to be configured.');
+        }
+        if ($this->cfg->save_json_files) {
+            if (!trim($this->cfg->assets_subfolder_json)) {
+                throw new Exception('Assets subfolder for JSON data has to be configured when "save_json_files" option is turned on.');
+            }
+        }
+
         // instantiate and assign SS GC API
         $this->gcAPI = new SSGatherContentAPI($this->cfg);
 
