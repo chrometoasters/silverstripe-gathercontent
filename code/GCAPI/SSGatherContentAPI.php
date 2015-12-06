@@ -248,10 +248,30 @@ class SSGatherContentAPI {
 
 
     /**
-     * Get all data related to a particular File.
+     * Get all data related to a particular File, store it prefixed with Project's ID
      * https://gathercontent.com/support/developer-api/ see 5.Files
+     *
+     * @param int $file_id
+     * @return array|bool
      */
-    public function getFile($file_id) {
+    public function getFileForProject($file_id) {
+        $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        if ($data && $this->gcConfig->save_json_files) {
+            $project_id = $data['project_id'];
+            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_file_{$file_id}.json");
+        }
+        return $data;
+    }
+
+
+    /**
+     * Get all data related to a particular File, store it prefixed with Item's ID
+     * https://gathercontent.com/support/developer-api/ see 5.Files
+     *
+     * @param int $file_id
+     * @return array|bool
+     */
+    public function getFileForItem($file_id) {
         $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
         if ($data && $this->gcConfig->save_json_files) {
             $item_id = $data['page_id'];
