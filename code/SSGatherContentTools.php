@@ -187,13 +187,18 @@ class SSGatherContentTools extends Object {
      * Save given data into a file under assets subfolder, optionally creating unique file name when overwriting is disabled.
      * If the .json file extension is not part of the filename, it will be added.
      *
+     * By default this function also index the file in the CMS and return its ID. For backup it's not necessary, so it
+     * can be turned off.
+     *
      * @param mixed $data                   data to be stored in the JSON file
      * @param string $assetsSubfolder       subfolder under assets folder where to store the file
      * @param string $filename              filename to be used
      * @param bool|true $overwriteFiles     overwrite already existing files? if false, unique filename is generated if file already exists
-     * @return bool|int                     ID of File within the cms OR false in case of failure
+     * @param bool|true $indexInTheCMS      determine whether to index the file in the CMS and return value
+     * @return bool|int|array               ID of File within the cms when indexed in the CMS OR 'store' array as returned
+     *                                      from getFolderAndUniqueFilename OR false in case of failure
      */
-    public static function saveDataInJSON($data, $assetsSubfolder, $filename, $overwriteFiles = true) {
+    public static function saveDataInJSON($data, $assetsSubfolder, $filename, $overwriteFiles = true, $indexInTheCMS = true) {
 
         // check file extension
         if (substr($filename, -5) !== '.json') {
@@ -206,7 +211,11 @@ class SSGatherContentTools extends Object {
 
         // if saved successfully, update CMS db and return ID of the file
         if (file_put_contents($store['fullPath'], json_encode($data))) {
-            return $folder->constructChild($store['filename']);
+            if ($indexInTheCMS) {
+                return $folder->constructChild($store['filename']);
+            } else {
+                return $store;
+            }
         } else {
             return false;
         }
