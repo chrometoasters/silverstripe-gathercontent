@@ -218,6 +218,9 @@ class SSGatherContentAPI {
     /**
      * Retrieve all files belonging to a particular Project
      * https://gathercontent.com/support/developer-api/ see 5.Files
+     *
+     * @param int $project_id       project ID for which we get files info
+     * @return array|bool           data OR false
      */
     public function getFilesByProject($project_id) {
         $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
@@ -231,6 +234,9 @@ class SSGatherContentAPI {
     /**
      * Retrieve all files belonging to a particular Item
      * https://gathercontent.com/support/developer-api/ see 5.Files
+     *
+     * @param int $item_id          item ID for which we get files info
+     * @return array|bool           data OR false
      */
     public function getFilesByItem($item_id) {
         $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
