@@ -264,4 +264,23 @@ class SSGatherContentTools extends Object {
         return false;
     }
 
+
+    /**
+     * Join multiple strings into correct path, inspired by http://stackoverflow.com/a/15575293/2303501
+     * Accepts variable number of string parts.
+     *
+     * @return string       joined path / separated without duplicated /
+     */
+    public static function joinPaths() {
+        $paths = [];
+
+        foreach (func_get_args() as $arg) {
+            if ($arg !== '') {
+                $paths[] = $arg;
+            }
+        }
+
+        return preg_replace('#/+#', '/', join('/', $paths));
+    }
+
 }
