@@ -162,7 +162,7 @@ class SSGatherContentTools extends Object {
      * @param bool $overwriteFiles          overwrite already existing files? if false, unique filename is generated if file already exists
      * @return bool|int                     ID of File within the cms OR false in case of failure
      */
-    public static function downloadFileIntoAssetsFolder($S3FileStoreUrl, $S3FileIdentifier, $assetsSubfolder, $filename, $overwriteFiles) {
+    public static function downloadFileIntoAssetsSubfolder($S3FileStoreUrl, $S3FileIdentifier, $assetsSubfolder, $filename, $overwriteFiles, $indexInTheCMS = true) {
 
         // get destination storage
         $store = self::getFolderAndUniqueFilename($assetsSubfolder, $filename, !$overwriteFiles);
@@ -176,7 +176,11 @@ class SSGatherContentTools extends Object {
 
         // if downloaded successfully, update CMS db and return ID of the file
         if ($res && $res['response'] && ($res['code'] === 200)) {
-            return $folder->constructChild($store['filename']);
+            if ($indexInTheCMS) {
+                return $folder->constructChild($store['filename']);
+            } else {
+                return true;
+            }
         } else {
             return false;
         }
