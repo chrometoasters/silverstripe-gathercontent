@@ -241,4 +241,27 @@ class SSGatherContentTools extends Object {
 
     }
 
+
+    /**
+     * Back up given data into a file under assets subfolder. Wrapper for saveDataInJSON function for a specific use
+     * by backup methods of the API
+     * Hardcoded: files overwriting, not indexing files in the CMS
+     *
+     * @param mixed $data                   data to be backed up in a JSON file
+     * @param string $assetsSubfolder       subfolder under assets folder where to store the file
+     * @param string $filename              filename to be used
+     * @return array|bool                   'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure or no data
+     */
+    public static function backupDataInJSON($data, $assetsSubfolder, $filename) {
+
+        if ($data) {
+            $store = self::saveDataInJSON($data, $assetsSubfolder, $filename, true, false);
+            if ($store) {
+                return ['data' => $data, 'store' => $store];
+            }
+        }
+
+        return false;
+    }
+
 }
