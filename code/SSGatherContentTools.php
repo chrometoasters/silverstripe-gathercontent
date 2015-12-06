@@ -188,6 +188,21 @@ class SSGatherContentTools extends Object {
 
 
     /**
+     * Download and back up file from GatherContent S3 storage, save it under given assets folder overwriting existing files, not indexing in the CMS
+     * Wrapping function for downloadFileIntoAssetsSubfolder with some hardcoded parameters
+     *
+     * @param string $S3FileStoreUrl        GC S3 url with trailing slash
+     * @param string $S3FileIdentifier      GC S3 file identifier obtained from the API call
+     * @param string $assetsSubfolder       subfolder under assets folder where to store downloaded file
+     * @param string $filename              original filename used when uploading to GC under which the file is stored (if overwriteFiles is false, could be unique variation)
+     * @return bool                         successfully downloaded and stored?
+     */
+    public static function backupFileIntoAssetsSubfolder($S3FileStoreUrl, $S3FileIdentifier, $assetsSubfolder, $filename) {
+        return self::downloadFileIntoAssetsSubfolder($S3FileStoreUrl, $S3FileIdentifier, $assetsSubfolder, $filename, true, false);
+    }
+
+
+    /**
      * Save given data into a file under assets subfolder, optionally creating unique file name when overwriting is disabled.
      * If the .json file extension is not part of the filename, it will be added.
      *
