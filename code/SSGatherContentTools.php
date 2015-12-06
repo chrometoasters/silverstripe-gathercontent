@@ -311,4 +311,50 @@ class SSGatherContentTools extends Object {
         return $array;
     }
 
+
+    /**
+     * Function to call all passed in filters to transform the input value
+     *
+     * @param array $filters            array of callable functions to be applied to the input, optionally with params
+     * @param mixed $input              input to be transformed
+     * @return mixed                    transformed input after all the callable functions have been applied to it
+     */
+    public static function applyTransformationFilters($filters, $input) {
+
+        // we expect non-empty array of callable
+        if (is_array($filters) && !empty($filters)) {
+
+            /// iterate over list of filters
+            foreach ($filters as $filter_item) {
+                // is it an array meaning we have some params?
+                if (is_array($filter_item)) {
+                    // split fn and params
+                    $filter_item_args = reset($filter_item);
+                    $filter_item_fn = key($filter_item);
+                } else {
+                    // no params
+                    $filter_item_args = null;
+                    $filter_item_fn = $filter_item;
+                }
+
+                // is the fn actually callable?
+                if (is_callable($filter_item_fn)) {
+                    // do we have any params?
+                    if ($filter_item_args !== null) {
+                        // call with params
+                        $input = call_user_func($filter_item_fn, $input, $filter_item_args);
+                    } else {
+                        // call with no params
+                        $input = call_user_func($filter_item_fn, $input);
+                    }
+                }
+            }
+        }
+
+        // pass through transformed input
+        return $input;
+    }
+
+
+
 }
