@@ -56,7 +56,7 @@ class SSGatherContentAPI {
      */
     public function getMe() {
         $data = $this->gcAPI->readAPI('me');
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, 'me.json');
         }
         return $data;
@@ -69,7 +69,7 @@ class SSGatherContentAPI {
      */
     public function getAccounts() {
         $data = $this->gcAPI->readAPI('accounts');
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, 'accounts.json');
         }
         return $data;
@@ -86,7 +86,7 @@ class SSGatherContentAPI {
     public function getProjects($account_id) {
         $method = 'projects?account_id=' . intval($account_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "account_{$account_id}_projects.json");
         }
         return $data;
@@ -103,7 +103,7 @@ class SSGatherContentAPI {
     public function getProject($project_id) {
         $method = 'projects/' . intval($project_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}.json");
         }
         return $data;
@@ -120,7 +120,7 @@ class SSGatherContentAPI {
     public function getItems($project_id) {
         $method = 'items?project_id=' . intval($project_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_items.json");
         }
         return $data;
@@ -137,8 +137,9 @@ class SSGatherContentAPI {
     public function getItem($item_id) {
         $method = 'items/' . intval($item_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
-            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "item_{$item_id}.json");
+        if ($data && $this->gcConfig->save_json_files) {
+            $project_id = $data['project_id'];
+            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_item_{$item_id}.json");
         }
         return $data;
     }
@@ -154,7 +155,7 @@ class SSGatherContentAPI {
     public function getTemplates($project_id) {
         $method = 'templates?project_id=' . intval($project_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_templates.json");
         }
         return $data;
@@ -171,8 +172,9 @@ class SSGatherContentAPI {
     public function getTemplate($template_id) {
         $method = 'templates/' . intval($template_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
-            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "template_{$template_id}.json");
+        if ($data && $this->gcConfig->save_json_files) {
+            $project_id = $data['project_id'];
+            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_template_{$template_id}.json");
         }
         return $data;
     }
@@ -188,7 +190,7 @@ class SSGatherContentAPI {
     public function getStatuses($project_id) {
         $method = 'projects/' . intval($project_id) . '/statuses';
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_statuses.json");
         }
         return $data;
@@ -206,7 +208,7 @@ class SSGatherContentAPI {
     public function getStatus($project_id, $status_id) {
         $method = 'projects/' . intval($project_id) . '/statuses/' . intval($status_id);
         $data = $this->gcAPI->readAPI($method);
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_status_{$status_id}.json");
         }
         return $data;
@@ -219,7 +221,7 @@ class SSGatherContentAPI {
      */
     public function getFilesByProject($project_id) {
         $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_files.json");
         }
         return $data;
@@ -232,7 +234,7 @@ class SSGatherContentAPI {
      */
     public function getFilesByItem($item_id) {
         $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
+        if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "item_{$item_id}_files.json");
         }
         return $data;
@@ -245,8 +247,9 @@ class SSGatherContentAPI {
      */
     public function getFile($file_id) {
         $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
-        if ($this->gcConfig->save_json_files && trim($this->gcConfig->assets_subfolder_json)) {
-            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "file_{$file_id}.json");
+        if ($data && $this->gcConfig->save_json_files) {
+            $item_id = $data['page_id'];
+            SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "item_{$item_id}_file_{$file_id}.json");
         }
         return $data;
     }
