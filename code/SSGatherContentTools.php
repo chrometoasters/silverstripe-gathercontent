@@ -283,4 +283,32 @@ class SSGatherContentTools extends Object {
         return preg_replace('#/+#', '/', join('/', $paths));
     }
 
+
+    /**
+     * Transform array of values into an array where indexes are define by $keyKey variable
+     * and values by $valueKey.
+     *
+     * Should only be used for arrays with given strict structure such as API returned data where all the items
+     * have the same structure.
+     *
+     *
+     * @param array $array              array to "flatten"
+     * @param string|null $keyKey       key from the above array's item to be used as index for the product array OR null to not transform the key
+     * @param string|null $valueKey     key from the above array's item to define the values for the product array OR null to use whole item
+     * @return string                   "flattened" array
+     */
+    public static function transformArray($array, $keyKey = null, $valueKey = null) {
+
+        foreach ($array as $key => $item) {
+            if ($keyKey && array_key_exists($keyKey, $item)) {
+                $array[$item[$keyKey]] = ($valueKey ? $item[$valueKey] : $item);
+                unset($array[$key]);
+            } else {
+                $array[$key] = ($valueKey ? $item[$valueKey] : $item);
+            }
+        }
+
+        return $array;
+    }
+
 }
