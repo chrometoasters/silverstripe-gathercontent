@@ -298,6 +298,114 @@ class SSGatherContent extends Object {
     }
 
 
+    /**
+     * Backup all content and all files from GatherContent into JSON or standard files (content or file)
+     * under configured assets subfolder.
+     * Those backup files can't be easily used without further care to restore data in GatherContent, they should
+     * really serve as a snapshot.
+     *
+     * Configuration also determines whether the backup folder has date and time subfolder created each time the backup
+     * is run.
+     */
+    public function backupContentFromGatherContent() {
+
+        if ($this->cfg->suffix_backup_with_datetime) {
+            $backup_folder_files = SSGatherContentTools::joinPaths($this->cfg->assets_subfolder_backup, date('Y-m-d_H-i-s'));
+            Config::inst()->update('SSGatherContent', 'assets_subfolder_backup', $backup_folder_files);
+        }
+
+        // me
+        $this->gcAPI->backupMe();
+
+        // accounts
+        $accounts = $this->gcAPI->backupAccounts();
+        if ($accounts) {
+            $accounts = $accounts['data'];
+
+            // iterate over accounts and pick only the one we have configured
+            foreach ($accounts as $single_account) {
+                if (strtolower($single_account['slug']) !== strtolower($this->cfg->plugin_api['accountname'])) continue;
+
+                $account_id = $single_account['id'];
+
+                // projects
+                $projects = $this->gcAPI->backupProjects($account_id);
+                if ($projects) {
+                    $projects = $projects['data'];
+
+                    // iterate over projects and pick only the one we have configured
+                    foreach ($projects as $single_project) {
+                        if (strtolower($single_project['name']) !== strtolower($this->cfg->project)) continue;
+
+                        $project_id = $single_project['id'];
+
+                        // statuses
+                        $statuses = $this->gcAPI->backupStatuses($project_id);
+                        if ($statuses) {
+                            $statuses = $statuses['data'];
+
+                            // iterate over statuses
+                            foreach ($statuses as $single_status) {
+                                $status_id = $single_status['id'];
+
+                                $this->gcAPI->backupStatus($project_id, $status_id);
+                            }
+                        }
+
+                        // templates
+                        $templates = $this->gcAPI->backupTemplates($project_id);
+                        if ($templates) {
+                            $templates = $templates['data'];
+
+                            // iterate over templates
+                            foreach ($templates as $single_template) {
+                                $template_id = $single_template['id'];
+
+                                $this->gcAPI->backupTemplate($template_id);
+                            }
+                        }
+
+                        // files by project
+                        $files = $this->gcAPI->backupFilesByProject($project_id);
+                        if ($files) {
+                            $files = $files['data'];
+
+                            // iterate over files
+                            foreach ($files as $single_file) {
+                                $file_id = $single_file['id'];
+
+                                $file = $this->gcAPI->backupFileByProject($file_id);
+                                if ($file) {
+                                    $file = $file['data'];
+
+                                    // download file into assets
+                                    SSGatherContentTools::backupFileIntoAssetsSubfolder($this->cfg->s3_file_store_url, $file['filename'], SSGatherContentTools::joinPaths($this->cfg->assets_subfolder_backup, 'files'), $file['original_filename']);
+                                }
+                            }
+                        }
+
+                        // project
+                        $this->gcAPI->backupProject($project_id);
+
+                        // items
+                        $items = $this->gcAPI->backupItems($project_id);
+                        if ($items) {
+                            $items = $items['data'];
+
+                            // iterate over items
+                            foreach ($items as $single_item) {
+                                $item_id = $single_item['id'];
+
+                                $this->gcAPI->backupItem($item_id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
 }
