@@ -27,13 +27,13 @@ SSGatherContent:
   allow_publish: false
 
   processors:
-    field:
-    value:
+    field: []
+    value: []
 
   mappings:
     classes:
 
   statuses:
-    skip:
-    draft:
-    publish:
+    skip: []
+    draft: []
+    publish: []

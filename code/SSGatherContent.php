@@ -239,6 +239,43 @@ class SSGatherContent extends Object {
             }
         }
 
+
+        // ensure status mappings are all arrays
+        $statuses = $this->cfg->statuses;
+        if ((array_key_exists('skip', $statuses) && $statuses['skip'] && !is_array($statuses['skip']))
+         || (array_key_exists('draft', $statuses) && $statuses['draft'] && !is_array($statuses['draft']))
+         || (array_key_exists('publish', $statuses) && $statuses['publish'] && !is_array($statuses['publish']))) {
+            throw new Exception('All status mappings have to be configured as arrays.');
+        }
+        if (!array_key_exists('skip', $statuses)) {
+            $statuses['skip'] = [];
+        }
+        if (!array_key_exists('draft', $statuses)) {
+            $statuses['draft'] = [];
+        }
+        if (!array_key_exists('publish', $statuses)) {
+            $statuses['publish'] = [];
+        }
+        Config::inst()->remove('SSGatherContent', 'statuses'); // remove needed otherwise arrays get merged, not replaced
+        Config::inst()->update('SSGatherContent', 'statuses', $statuses);
+
+
+        // ensure processors are all arrays (if defined)
+        $processors = $this->cfg->processors;
+        if ((array_key_exists('field', $processors) && $processors['field'] && !is_array($processors['field']))
+         || (array_key_exists('value', $processors) && $processors['value'] && !is_array($processors['value']))) {
+            throw new Exception('All field and value processors have to be configured as arrays.');
+        }
+        if (!array_key_exists('field', $processors)) {
+            $processors['field'] = [];
+        }
+        if (!array_key_exists('value', $processors)) {
+            $processors['value'] = [];
+        }
+        Config::inst()->remove('SSGatherContent', 'processors'); // remove needed otherwise arrays get merged, not replaced
+        Config::inst()->update('SSGatherContent', 'processors', $processors);
+
+
         // instantiate and assign SS GC API
         $this->gcAPI = new SSGatherContentAPI($this->cfg);
 
