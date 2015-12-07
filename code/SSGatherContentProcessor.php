@@ -59,4 +59,25 @@ class SSGatherContentProcessor extends Object {
     }
 
 
+    /**
+     * If provided value is string, trim it, otherwise leave intact
+     *
+     * Passed in but accessed via func_get_args()
+     * param $value
+     *
+     * @return string|mixed         trimmed string or original value
+     */
+    public static function trimString() {
+        $args = func_get_args();
+        $value = $args[0];
+
+        // trim string
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        return $value;
+    }
+
+
 }
