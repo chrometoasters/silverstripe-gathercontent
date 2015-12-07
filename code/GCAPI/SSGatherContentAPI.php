@@ -304,4 +304,249 @@ class SSGatherContentAPI {
         return $data;
     }
 
+
+    /**
+     * Backup information about the current logged in GC user
+     *
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupMe($data = null) {
+        if ($data === null) {
+            $data = $this->gcAPI->readAPI('me');
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, 'me.json');
+     }
+
+
+    /**
+     * Backup list of all Accounts associated with the current logged in GC user
+     *
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupAccounts($data = null) {
+        if ($data === null) {
+            $data = $this->gcAPI->readAPI('accounts');
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, 'accounts.json');
+    }
+
+
+    /**
+     * Backup list of all Projects associated with the current logged in GC user
+     *
+     * @param int $account_id       account ID to fetch projects for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupProjects($account_id, $data = null) {
+        if ($data === null) {
+            $method = 'projects?account_id=' . intval($account_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "account_{$account_id}_projects.json");
+    }
+
+
+    /**
+     * Backup list of all Projects associated with the current logged in GC user
+     *
+     * @param int $project_id       project ID
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupProject($project_id, $data = null) {
+        if ($data === null) {
+            $method = 'projects/' . intval($project_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}.json");
+    }
+
+
+    /**
+     * Backup list of all Items for particular Project.
+     *
+     * @param int $project_id       project ID to fetch items for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupItems($project_id, $data = null) {
+        if ($data === null) {
+            $method = 'items?project_id=' . intval($project_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_items.json");
+    }
+
+
+    /**
+     * Backup all data related to a particular Item.
+     *
+     * @param int $item_id          item ID
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupItem($item_id, $data = null) {
+        if ($data === null) {
+            $method = 'items/' . intval($item_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        if ($data) {
+            $project_id = $data['project_id'];
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_item_{$item_id}.json");
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Backup list of all Templates associated with particular Project.
+     *
+     * @param int $project_id       project ID to fetch templates for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupTemplates($project_id, $data = null) {
+        if ($data === null) {
+            $method = 'templates?project_id=' . intval($project_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_templates.json");
+    }
+
+
+    /**
+     * Backup all data related to a particular Template.
+     *
+     * @param int $template_id      template ID
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupTemplate($template_id, $data = null) {
+        if ($data === null) {
+            $method = 'templates/' . intval($template_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        if ($data) {
+            $project_id = $data['project_id'];
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_template_{$template_id}.json");
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Backup list of all Statuses associated with a particular Project.
+     *
+     * @param int $project_id       project ID to fetch status for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupStatuses($project_id, $data = null) {
+        if ($data === null) {
+            $method = 'projects/' . intval($project_id) . '/statuses';
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_statuses.json");
+    }
+
+
+    /**
+     * Backup all data related to a particular Status.
+     *
+     * @param int $project_id       project ID from which we get status info
+     * @param int $status_id        status ID to get info for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupStatus($project_id, $status_id, $data = null) {
+        if ($data === null) {
+            $method = 'projects/' . intval($project_id) . '/statuses/' . intval($status_id);
+            $data = $this->gcAPI->readAPI($method);
+        }
+        return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_status_{$status_id}.json");
+    }
+
+
+    /**
+     * Backup information about all files belonging to a particular Project
+     *
+     * @param int $project_id       project ID to get files for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupFilesByProject($project_id, $data = null) {
+        if ($data === null) {
+            $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
+        }
+        if ($data) {
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_files.json");
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Backup information about all files belonging to a particular Item
+     *
+     * @param int $item_id          item ID to get files for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupFilesByItem($item_id, $data = null) {
+        if ($data === null) {
+            $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
+        }
+        if ($data) {
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "item_{$item_id}_files.json");
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Backup data related to a particular File and reflect Item in filename
+     *
+     * @param int $file_id          file ID to get data for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupFileByItem($file_id, $data = null) {
+        if ($data === null) {
+            $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        }
+        if ($data) {
+            $item_id = $data['page_id'];
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "item_{$item_id}_file_{$file_id}.json");
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Backup data related to a particular File and reflect Project in filename
+     *
+     * @param int $file_id          file ID to get data for
+     * @param mixed|null $data      data to be saved if provided, otherwise they will be fetched from the API
+     * @return array|bool           'store' array as returned by getFolderAndUniqueFilename and provided data OR false in case of failure
+     */
+    public function backupFileByProject($file_id, $data = null) {
+        if ($data === null) {
+            $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        }
+        if ($data) {
+            $project_id = $data['project_id'];
+            return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_file_{$file_id}.json");
+        } else {
+            return false;
+        }
+    }
+
 }
