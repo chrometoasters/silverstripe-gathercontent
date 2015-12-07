@@ -37,3 +37,5 @@ SSGatherContent:
     skip: []
     draft: []
     publish: []
+
+  translations: []

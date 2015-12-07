@@ -170,6 +170,18 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Translate value to another value. Array is indexed by GatherContent's field names and holds pairs
+     * of GC-value => CMS-value
+     * Useful for example for GatherContent's choice_radio implemented as enum in the CMS where the values in
+     * GatherContent are much longer and need to be abbreviated for the enum
+     *
+     * @var array
+     * @config
+     */
+    private static $translations = [];
+
+
+    /**
      * Shortcut to current config object, loaded in constructor
      *
      * @var Config_ForClass|null
