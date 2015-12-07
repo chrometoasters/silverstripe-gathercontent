@@ -224,6 +224,7 @@ class SSGatherContent extends Object {
         if (substr($apiCfg['url'], -1, 1) !== '/') {
             $apiCfg['url'] .= '/';
         }
+        Config::inst()->remove('SSGatherContent', 'api'); // remove needed otherwise arrays get merged, not replaced
         Config::inst()->update('SSGatherContent', 'api', $apiCfg);
 
 
@@ -236,6 +237,7 @@ class SSGatherContent extends Object {
         if (strpos($pluginApiCfg['url'],'%%ACCOUNTNAME%%') !== false) {
             $pluginApiCfg['url'] = str_replace('%%ACCOUNTNAME%%', $pluginApiCfg['accountname'], $pluginApiCfg['url']);
         }
+        Config::inst()->remove('SSGatherContent', 'plugin_api'); // remove needed otherwise arrays get merged, not replaced
         Config::inst()->update('SSGatherContent', 'plugin_api', $pluginApiCfg);
 
 
