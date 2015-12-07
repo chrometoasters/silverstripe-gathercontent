@@ -130,6 +130,7 @@ class SSGatherContent extends Object {
 
     /**
      * Determine whether to directly publish items that have status allowing them to be published in the CMS
+     * and are descendants of SiteTree. DataObject are basically either published or don't exist.
      *
      * @var bool
      * @config
@@ -159,7 +160,7 @@ class SSGatherContent extends Object {
     /**
      * Mapping for GatherContent workflow statuses dividing item statuses into three groups:
      * - skip (items disregarded in the CMS)
-     * - draft (items created as draft items, not published)
+     * - draft (items created as draft items, not published) - this is default if a status does not fall into another group
      * - publish (items published in the CMS, if settings allow)
      *
      * @var array
