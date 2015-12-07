@@ -37,4 +37,20 @@ class SSGatherContentProcessor extends Object {
     }
 
 
+    /**
+     * Convert string to camelCase with extra delimiters added
+     *
+     * Passed in but accessed via func_get_args()
+     * param $value
+     *
+     * @return string
+     */
+    public static function camelCase() {
+        $args = func_get_args();
+        $value = $args[0];
+
+        return ucwords($value, " \t\r\n\f\v-_;");
+    }
+
+
 }
