@@ -35,7 +35,7 @@ abstract class SSGatherContentGeneralAPIWrapper {
      * @param string $method        API method
      * @param array $params         POST data
      */
-    abstract protected function callAPI($method = '', $params = []);
+    abstract protected function callAPI($method = '', $params = array());
 
 
 }

@@ -53,7 +53,7 @@ class SSGatherContentProcessor extends Object {
         $value = ucwords($value, " \t\r\n\f\v-_;");
 
         // remove word splitting characters
-        $value = str_replace(str_split(" \t\r\n\f\v-_;"), [], $value);
+        $value = str_replace(str_split(" \t\r\n\f\v-_;"), array(), $value);
 
         return $value;
     }

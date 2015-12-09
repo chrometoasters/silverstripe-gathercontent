@@ -17,7 +17,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $api = [];
+    private static $api = array();
 
 
     /**
@@ -30,7 +30,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $plugin_api = [];
+    private static $plugin_api = array();
 
 
     /**
@@ -145,7 +145,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $processors = [];
+    private static $processors = array();
 
 
     /**
@@ -154,7 +154,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $mappings = [];
+    private static $mappings = array();
 
 
     /**
@@ -166,7 +166,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $statuses = [];
+    private static $statuses = array();
 
 
     /**
@@ -178,7 +178,7 @@ class SSGatherContent extends Object {
      * @var array
      * @config
      */
-    private static $translations = [];
+    private static $translations = array();
 
 
     /**
@@ -263,13 +263,13 @@ class SSGatherContent extends Object {
             throw new Exception('All status mappings have to be configured as arrays.');
         }
         if (!array_key_exists('skip', $statuses)) {
-            $statuses['skip'] = [];
+            $statuses['skip'] = array();
         }
         if (!array_key_exists('draft', $statuses)) {
-            $statuses['draft'] = [];
+            $statuses['draft'] = array();
         }
         if (!array_key_exists('publish', $statuses)) {
-            $statuses['publish'] = [];
+            $statuses['publish'] = array();
         }
         Config::inst()->remove('SSGatherContent', 'statuses'); // remove needed otherwise arrays get merged, not replaced
         Config::inst()->update('SSGatherContent', 'statuses', $statuses);
@@ -282,10 +282,10 @@ class SSGatherContent extends Object {
             throw new Exception('All field and value processors have to be configured as arrays.');
         }
         if (!array_key_exists('field', $processors)) {
-            $processors['field'] = [];
+            $processors['field'] = array();
         }
         if (!array_key_exists('value', $processors)) {
-            $processors['value'] = [];
+            $processors['value'] = array();
         }
         Config::inst()->remove('SSGatherContent', 'processors'); // remove needed otherwise arrays get merged, not replaced
         Config::inst()->update('SSGatherContent', 'processors', $processors);

@@ -19,10 +19,10 @@ class SSGatherContentAPIWrapper extends SSGatherContentGeneralAPIWrapper {
      * @param array $params         POST data to be passed through to the endpoint
      * @return array                array containing response and http code returned by curl
      */
-    protected function callAPI($method = '', $params = []) {
+    protected function callAPI($method = '', $params = array()) {
 
         $url = $this->cfg['url'] . $method;
-        $httpHeader = ['Accept: application/vnd.gathercontent.v0.5+json'];
+        $httpHeader = array('Accept: application/vnd.gathercontent.v0.5+json');
         $userPwd = $this->cfg['username'] . ':' . $this->cfg['key'];
 
         return SSGatherContentTools::fetchAPI($url, $httpHeader, $userPwd, $params);
@@ -37,7 +37,7 @@ class SSGatherContentAPIWrapper extends SSGatherContentGeneralAPIWrapper {
      * @param array $params         POST data to be passed through to the endpoint
      * @return array|bool           false on error OR response data in an associative array
      */
-    public function readAPI($method, $params = []) {
+    public function readAPI($method, $params = array()) {
 
         $result = $this->callAPI($method, $params); // false or [code, response] array
 

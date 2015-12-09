@@ -223,7 +223,7 @@ class SSGatherContentAPI {
      * @return array|bool           data OR false
      */
     public function getFilesByProject($project_id) {
-        $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
+        $data = $this->gcPluginAPI->readAPI('get_files_by_project', array('id' => $project_id), 'files');
         if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_files.json");
         }
@@ -239,7 +239,7 @@ class SSGatherContentAPI {
      * @return array|bool           data OR false
      */
     public function getFilesByItem($item_id) {
-        $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
+        $data = $this->gcPluginAPI->readAPI('get_files_by_page', array('id' => $item_id), 'files');
         if ($data && $this->gcConfig->save_json_files) {
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "item_{$item_id}_files.json");
         }
@@ -256,7 +256,7 @@ class SSGatherContentAPI {
      * @return array|bool           data OR false
      */
     public function getFileByItemAndField($item_id, $field_id) {
-        $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
+        $data = $this->gcPluginAPI->readAPI('get_files_by_page', array('id' => $item_id), 'files');
         if ($data && is_array($data)) {
             foreach ($data as $file) {
                 if ($file['field'] === $field_id) {
@@ -279,7 +279,7 @@ class SSGatherContentAPI {
      * @return array|bool
      */
     public function getFileForProject($file_id) {
-        $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        $data = $this->gcPluginAPI->readAPI('get_file', array('id' => $file_id), 'file');
         if ($data && $this->gcConfig->save_json_files) {
             $project_id = $data['project_id'];
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "project_{$project_id}_file_{$file_id}.json");
@@ -296,7 +296,7 @@ class SSGatherContentAPI {
      * @return array|bool
      */
     public function getFileForItem($file_id) {
-        $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+        $data = $this->gcPluginAPI->readAPI('get_file', array('id' => $file_id), 'file');
         if ($data && $this->gcConfig->save_json_files) {
             $item_id = $data['page_id'];
             SSGatherContentTools::saveDataInJSON($data, $this->gcConfig->assets_subfolder_json, "item_{$item_id}_file_{$file_id}.json");
@@ -481,7 +481,7 @@ class SSGatherContentAPI {
      */
     public function backupFilesByProject($project_id, $data = null) {
         if ($data === null) {
-            $data = $this->gcPluginAPI->readAPI('get_files_by_project', ['id' => $project_id], 'files');
+            $data = $this->gcPluginAPI->readAPI('get_files_by_project', array('id' => $project_id), 'files');
         }
         if ($data) {
             return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "project_{$project_id}_files.json");
@@ -500,7 +500,7 @@ class SSGatherContentAPI {
      */
     public function backupFilesByItem($item_id, $data = null) {
         if ($data === null) {
-            $data = $this->gcPluginAPI->readAPI('get_files_by_page', ['id' => $item_id], 'files');
+            $data = $this->gcPluginAPI->readAPI('get_files_by_page', array('id' => $item_id), 'files');
         }
         if ($data) {
             return SSGatherContentTools::backupDataInJSON($data, $this->gcConfig->assets_subfolder_backup, "item_{$item_id}_files.json");
@@ -519,7 +519,7 @@ class SSGatherContentAPI {
      */
     public function backupFileByItem($file_id, $data = null) {
         if ($data === null) {
-            $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+            $data = $this->gcPluginAPI->readAPI('get_file', array('id' => $file_id), 'file');
         }
         if ($data) {
             $item_id = $data['page_id'];
@@ -539,7 +539,7 @@ class SSGatherContentAPI {
      */
     public function backupFileByProject($file_id, $data = null) {
         if ($data === null) {
-            $data = $this->gcPluginAPI->readAPI('get_file', ['id' => $file_id], 'file');
+            $data = $this->gcPluginAPI->readAPI('get_file', array('id' => $file_id), 'file');
         }
         if ($data) {
             $project_id = $data['project_id'];
