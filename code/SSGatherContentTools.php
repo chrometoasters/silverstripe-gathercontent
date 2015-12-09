@@ -22,7 +22,7 @@ class SSGatherContentTools extends Object {
      * @param array $params         POST data to be passed through to the endpoint
      * @return array                array containing response and http code returned by curl
      */
-    public static function fetchAPI($url, $httpHeader, $userPwd, $params = [], $pluginAPI = false) {
+    public static function fetchAPI($url, $httpHeader, $userPwd, $params = array(), $pluginAPI = false) {
 
         try {
 
@@ -51,10 +51,10 @@ class SSGatherContentTools extends Object {
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            return [
+            return array(
                 'code' => (int)$httpCode,
                 'response' => $response,
-            ];
+            );
 
         } catch (Exception $e) {
             return false;
@@ -92,10 +92,10 @@ class SSGatherContentTools extends Object {
             curl_close($ch);
             fclose($fp);
 
-            return [
+            return array(
                 'code' => (int)$httpCode,
                 'response' => $response,
-            ];
+            );
 
         } catch (Exception $e) {
             return false;
@@ -147,7 +147,7 @@ class SSGatherContentTools extends Object {
         // compose full absolute path
         $fullPath = $folder->getFullPath() . $destFilename;
 
-        return ['folder' => $folder, 'filename' => $destFilename, 'fullPath' => $fullPath];
+        return array('folder' => $folder, 'filename' => $destFilename, 'fullPath' => $fullPath);
     }
 
 
@@ -257,7 +257,7 @@ class SSGatherContentTools extends Object {
         if ($data) {
             $store = self::saveDataInJSON($data, $assetsSubfolder, $filename, true, false);
             if ($store) {
-                return ['data' => $data, 'store' => $store];
+                return array('data' => $data, 'store' => $store);
             }
         }
 
@@ -272,7 +272,7 @@ class SSGatherContentTools extends Object {
      * @return string       joined path / separated without duplicated /
      */
     public static function joinPaths() {
-        $paths = [];
+        $paths = array();
 
         foreach (func_get_args() as $arg) {
             if ($arg !== '') {
