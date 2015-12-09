@@ -6,8 +6,14 @@
     "keywords": ["silverstripe", "gathercontent", "import"],
     "license": "BSD-3-Clause",
     "authors": [
-        {"name": "Aneesha Budhia","email": "aneesha.budhia@chrometoaster.com"},
-        {"name": "Michal Kleiner","email": "michal.kleiner@chrometoaster.com"}
+        {
+            "name": "Aneesha Budhia",
+            "email": "aneesha.budhia@chrometoaster.com"
+        },
+        {
+            "name": "Michal Kleiner",
+            "email": "michal.kleiner@chrometoaster.com"
+        }
     ],
     "support": {
         "issues": "http://github.com/chrometoasters/silverstripe-gathercontent/issues"
