@@ -13,7 +13,7 @@
         "issues": "http://github.com/chrometoasters/silverstripe-gathercontent/issues"
     },
     "require": {
-        "silverstripe/cms": "~3.2",
-        "silverstripe/framework": "~3.2"
+        "silverstripe/cms": "^3.1",
+        "silverstripe/framework": "^3.1"
     }
 }
