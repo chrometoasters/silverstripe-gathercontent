@@ -49,11 +49,11 @@ class SSGatherContentProcessor extends Object {
         $args = func_get_args();
         $value = $args[0];
 
-        // camelCase the value
-        $value = ucwords($value, " \t\r\n\f\v-_;");
-
-        // remove word splitting characters
-        $value = str_replace(str_split(" \t\r\n\f\v-_;"), array(), $value);
+        // if string, camelCase the value and remove word splitting characters
+        if (is_string($value)) {
+            $value = ucwords($value, " \t\r\n\f\v-_;");
+            $value = str_replace(str_split(" \t\r\n\f\v-_;"), array(), $value);
+        }
 
         return $value;
     }
