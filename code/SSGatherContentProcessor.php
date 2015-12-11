@@ -71,9 +71,12 @@ class SSGatherContentProcessor extends Object {
         $args = func_get_args();
         $value = $args[0];
 
-        // trim string
         if (is_string($value)) {
+            // trim string
             $value = trim($value);
+
+            // unicode whitespaces (https://stackoverflow.com/questions/4166896/trim-unicode-whitespace-in-php-5-2)
+            $value = preg_replace('/^\p{Z}+|\p{Z}+$/u', '', $value);
         }
 
         return $value;
