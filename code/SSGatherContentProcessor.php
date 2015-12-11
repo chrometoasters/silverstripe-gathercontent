@@ -125,4 +125,31 @@ class SSGatherContentProcessor extends Object {
     }
 
 
+    /**
+     * If provided value is string, remove any html tags. Effectively a wrapper for strip_tags()
+     *
+     * Passed in but accessed via func_get_args()
+     * param $value
+     * param $allowable_tags
+     *
+     * @return string|mixed         string without html tags
+     */
+    public static function removeHTML() {
+        $args = func_get_args();
+        $value = $args[0];
+        if (isset($args[1])) {
+            $allowable_tags = $args[1];
+        } else {
+            $allowable_tags = null;
+        }
+
+        if (is_string($value)) {
+            // strip tags
+            $value = strip_tags($value, $allowable_tags);
+        }
+
+        return $value;
+    }
+
+
 }
