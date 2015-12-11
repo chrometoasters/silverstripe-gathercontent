@@ -104,4 +104,25 @@ class SSGatherContentProcessor extends Object {
     }
 
 
+    /**
+     * If provided value is an array, return its first value
+     *
+     * Passed in but accessed via func_get_args()
+     * param $value
+     *
+     * @return mixed                first value of array or original value
+     */
+    public static function firstFromArray() {
+        $args = func_get_args();
+        $value = $args[0];
+
+        // only if we've got an array
+        if (is_array($value)) {
+            $value = $value[0];
+        }
+
+        return $value;
+    }
+
+
 }
