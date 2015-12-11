@@ -152,4 +152,29 @@ class SSGatherContentProcessor extends Object {
     }
 
 
+    /**
+     * If provided value is string, remove all zero-width spaces
+     *
+     * Passed in but accessed via func_get_args()
+     * param $value
+     *
+     * @return string|mixed         string without zero-width spaces
+     */
+    public static function removeZeroWidthSpaces() {
+        $args = func_get_args();
+        $value = $args[0];
+        if (isset($args[1])) {
+            $allowable_tags = $args[1];
+        } else {
+            $allowable_tags = null;
+        }
+
+        if (is_string($value)) {
+            // strip tags
+            $value = str_replace('​','', $value);
+        }
+
+        return $value;
+    }
+
 }
