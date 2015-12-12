@@ -170,8 +170,9 @@ class SSGatherContent extends Object {
 
 
     /**
-     * Translate value to another value. Array is indexed by GatherContent's field names and holds pairs
-     * of GC-value => CMS-value
+     * Translate value to another value. Array holds pairs GC-value => CMS-value and translations are applied to all
+     * values coming from GatherContent. Per field translation configuration gets applied afterwards, if configured.
+     *
      * Useful for example for GatherContent's choice_radio implemented as enum in the CMS where the values in
      * GatherContent are much longer and need to be abbreviated for the enum
      *
@@ -289,6 +290,12 @@ class SSGatherContent extends Object {
         }
         Config::inst()->remove('SSGatherContent', 'processors'); // remove needed otherwise arrays get merged, not replaced
         Config::inst()->update('SSGatherContent', 'processors', $processors);
+
+
+        // ensure translations are array
+        if (!is_array($this->cfg->translations)) {
+            throw new Exception('Translations have to be configured as an array of "value -> translated value" pairs.');
+        }
 
 
         // instantiate and assign SS GC API
