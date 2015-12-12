@@ -230,6 +230,7 @@ class SSGatherContent extends Object {
         }
 
 
+        // prepare standard API configuration
         $apiCfg = $this->cfg->api; // need to go via a variable to be able to assign back to the config object
         // check for trailing slashes in the API url and add it if missing
         if (substr($apiCfg['url'], -1, 1) !== '/') {
@@ -239,6 +240,7 @@ class SSGatherContent extends Object {
         Config::inst()->update('SSGatherContent', 'api', $apiCfg);
 
 
+        // prepare plugin API configuration
         $pluginApiCfg = $this->cfg->plugin_api; // need to go via a variable to be able to assign back to the config object
         // check for trailing slashes in the plugin API url and add it if missing
         if (substr($pluginApiCfg['url'], -1, 1) !== '/') {
