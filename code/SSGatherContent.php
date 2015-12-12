@@ -139,6 +139,16 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Unique identifier in the CMS that the module can use to determine whether the item already exists in the CMS
+     * and we need to check if we can overwrite it or not
+     *
+     * @var bool
+     * @config
+     */
+    private static $unique_identifier;
+
+
+    /**
      * Holder for various attributes and values processors, e.g. for removing prefix
      * from field name or other strings and values magic
      *
