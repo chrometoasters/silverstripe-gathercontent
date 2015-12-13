@@ -17,7 +17,7 @@
  * Properties and methods are prefixed with GC so it's obvious they relate to GatherContent when used somewhere else.
  *
  */
-class GatherContentDataExtension extends DataExtension {
+class SSGatherContentDataExtension extends DataExtension {
 
     /**
      * Extension added fields
