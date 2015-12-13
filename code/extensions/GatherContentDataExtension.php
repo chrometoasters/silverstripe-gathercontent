@@ -39,19 +39,26 @@ class GatherContentDataExtension extends DataExtension {
      */
     public function updateCMSFields(FieldList $fields) {
 
-        // only add the tab and fields when the item was updated from GatherContent
-        if ($this->owner->GC_LastUpdated) {
+        // only add the tab and fields when the item was updated from GatherContent and it's a descendant of SiteTree
+        if ($this->owner->GC_LastUpdated && $this->owner instanceof SiteTree) {
 
             // get tab
             $fields->findOrMakeTab('Root.GatherContent', 'GatherContent info');
 
             // add fields
             $fields->addFieldsToTab('Root.GatherContent', array(
-                ReadonlyField::create('GC_ItemID', 'Item ID'),
+                ReadonlyField::create('GC_ID', 'Item ID'),
                 ReadonlyField::create('GC_DateCreated', 'Date imported from GatherContent'),
-                ReadonlyField::create('GC_LastUpdated', 'Date updated from GatherContent'),
-                TextareaField::create('GC_ItemLog', 'Log')->setRows(10)->performReadonlyTransformation(),
+                ReadonlyField::create('GC_DateLastUpdated', 'Date updated from GatherContent'),
+                TextareaField::create('GC_Log', 'Log')->setRows(10)->performReadonlyTransformation(),
             ));
+
+        } else {
+        // hide fields if not SiteTree
+            $fields->removeByName('GC_ID');
+            $fields->removeByName('GC_DateCreated');
+            $fields->removeByName('GC_DateLastUpdated');
+            $fields->removeByName('GC_Log');
         }
 
     }
