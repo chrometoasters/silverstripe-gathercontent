@@ -95,9 +95,11 @@ class SSGatherContentProcessor extends Object {
         $args = func_get_args();
         $value = $args[0];
 
-        // only explode strings
-        if (is_string($value)) {
+        // only explode non-zero-length strings
+        if (SSGatherContentProcessor::trimString($value)) {
             $value = explode("\n", $value);
+        } else {
+            $value = array();
         }
 
         return $value;
