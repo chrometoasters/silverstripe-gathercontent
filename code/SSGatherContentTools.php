@@ -379,7 +379,7 @@ class SSGatherContentTools extends Object {
         } elseif ($create) {
 
             try {
-                $item = $class::create();
+                $item = new $class();
                 $item->$field = $value;
                 $item->write();
 
