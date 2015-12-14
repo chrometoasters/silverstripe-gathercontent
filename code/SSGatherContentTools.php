@@ -356,5 +356,55 @@ class SSGatherContentTools extends Object {
     }
 
 
+    /**
+     * Lookup CMS item of given class based on a value of given field
+     *
+     * Optionally, if the item is not found, it can be created, if it's a simple one, with the value assigned
+     * to the specified field.
+     *
+     * @param string $field             name of the field to be used for lookup
+     * @param mixed $value              value to be looked for
+     * @param string $class             class of the item, defaulting to SiteTree for pages, can be a specific DO as well
+     * @param bool|false $create        whether to create the item if it wasn't found
+     * @return mixed|null               null when not found or failed creating, CMS item itself if found
+     */
+    public static function getItemByLookupField($field, $value, $class = 'SiteTree', $create = false) {
+        $item = $class::get()->filter(array($field => $value));
+
+        // if the item exists
+        if ($item->exists()) {
+            return $item->first();
+
+        // if the item doesn't exist but we can create it - handy for simple DOs for example
+        } elseif ($create) {
+
+            try {
+                $item = $class::create();
+                $item->$field = $value;
+                $item->write();
+
+                return $item;
+            } catch (Exception $ex) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Lookup CMS item of given class based on GatherContent stored ID
+     *
+     * This function uses more generic SSGatherContentTools::getItemByLookupField() with some predefined parameters.
+     *
+     * @param string $id                GatherContent ID
+     * @param string $class             class of the item
+     * @return mixed|null               CMS item itself OR null when not found
+     */
+    public static function getItemByGCID($id, $class = 'SiteTree') {
+        return SSGatherContentTools::getItemByLookupField('GC_ID', $id, $class, false);
+    }
+
 
 }
