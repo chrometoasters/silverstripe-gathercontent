@@ -65,6 +65,16 @@ class SSGatherContentDataExtension extends DataExtension {
 
 
     /**
+     * Store GatherContent item's ID
+     *
+     * @param int|string $id        ID
+     */
+    public function GC_storeItemID($id) {
+        $this->owner->GC_ItemID = $id;
+    }
+
+
+    /**
      * Store current or provided date as date when the item was created from GatherContent
      *
      * @param string|null $date     date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
@@ -90,16 +100,6 @@ class SSGatherContentDataExtension extends DataExtension {
         }
 
         $this->owner->GC_DateLastUpdated = $date;
-    }
-
-
-    /**
-     * Store GatherContent item's ID
-     *
-     * @param int|string $id        ID
-     */
-    public function GC_storeItemID($id) {
-        $this->owner->GC_ItemID = $id;
     }
 
 
