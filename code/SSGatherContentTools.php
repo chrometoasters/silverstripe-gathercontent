@@ -285,26 +285,36 @@ class SSGatherContentTools extends Object {
 
 
     /**
-     * Transform array of values into an array where indexes are define by $keyKey variable
+     * Transform array of values into an array where indexes are defined by $keyKey variable
      * and values by $valueKey.
      *
      * Should only be used for arrays with given strict structure such as API returned data where all the items
      * have the same structure.
      *
      *
-     * @param array $array              array to "flatten"
-     * @param string|null $keyKey       key from the above array's item to be used as index for the product array OR null to not transform the key
-     * @param string|null $valueKey     key from the above array's item to define the values for the product array OR null to use whole item
-     * @return string                   "flattened" array
+     * @param array $array                      array to "flatten"
+     * @param string|null $keyKey               key from the above array's item to be used as index for the product array OR null to not transform the key
+     * @param string|null $valueKey             key from the above array's item to define the values for the product array OR null to use whole item
+     * @param boolean|false $transformToArrays  determine whether to create array of nested items - useful for arrays with duplicate keys coming from keyKey value
+     * @return string                           "flattened" array
      */
-    public static function transformArray($array, $keyKey = null, $valueKey = null) {
+    public static function transformArray($array, $keyKey = null, $valueKey = null, $transformToArrays = false) {
 
-        foreach ($array as $key => $item) {
-            if ($keyKey && array_key_exists($keyKey, $item)) {
-                $array[$item[$keyKey]] = ($valueKey ? $item[$valueKey] : $item);
-                unset($array[$key]);
-            } else {
-                $array[$key] = ($valueKey ? $item[$valueKey] : $item);
+        if (is_array($array)) {
+            foreach ($array as $key => $item) {
+                if ($keyKey && is_array($item) && array_key_exists($keyKey, $item)) {
+                    if ($transformToArrays) {
+                        if (!array_key_exists($item[$keyKey], $array)) {
+                            $array[$item[$keyKey]] = array();
+                        }
+                        $array[$item[$keyKey]][$key] = ($valueKey ? $item[$valueKey] : $item);
+                    } else {
+                        $array[$item[$keyKey]] = ($valueKey ? $item[$valueKey] : $item);
+                    }
+                    unset($array[$key]);
+                } else {
+                    $array[$key] = ($valueKey ? $item[$valueKey] : $item);
+                }
             }
         }
 
@@ -369,6 +379,7 @@ class SSGatherContentTools extends Object {
      * @return mixed|null               null when not found or failed creating, CMS item itself if found
      */
     public static function getItemByLookupField($field, $value, $class = 'SiteTree', $create = false) {
+
         $item = $class::get()->filter(array($field => $value));
 
         // if the item exists
@@ -382,6 +393,8 @@ class SSGatherContentTools extends Object {
                 $item = new $class();
                 $item->$field = $value;
                 $item->write();
+
+                var_dump("created $class with field $field and value $value");
 
                 return $item;
             } catch (Exception $ex) {
