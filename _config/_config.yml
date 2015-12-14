@@ -30,7 +30,9 @@ SSGatherContent:
 
   processors:
     field: []
-    value: []
+    value:
+      - "SSGatherContentProcessor::trimString"
+      - "SSGatherContentProcessor::removeZeroWidthSpaces"
 
   mappings:
     classes:
