@@ -73,7 +73,7 @@ class SSGatherContentDataExtension extends DataExtension {
      * @param int|string $id        ID
      */
     public function GC_storeItemID($id) {
-        $this->owner->GC_ItemID = $id;
+        $this->owner->GC_ID = $id;
     }
 
 
