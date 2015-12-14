@@ -313,7 +313,46 @@ class SSGatherContent extends Object {
         // instantiate and assign SS GC API
         $this->gcAPI = new SSGatherContentAPI($this->cfg);
 
+    }
 
+
+    /**
+     * Download file previously uploaded to GatherContent using its GC S3 identifier and original filename
+     *
+     * This function uses general module configuration around the assets subfolder path and overwriting existing files.
+     * If the GatherContentDataExtensions is configured for files, store GC item's ID and created/lastUpdate date & time.
+     *
+     * @param string|array $GCItem          either GatherContent item ID or a full file dataset from which we read needed attributes
+     * @param string|null $S3Identifier     GatherContent S3 identifier of the file
+     * @param string|null $filename         original filename as uploaded to GatherContent
+     * @return bool|File                    ID of the file created under assets OR false when unsuccessful
+     */
+    private function downloadFileIntoAssetsSubfolder($GCItem, $S3Identifier = null, $filename = null) {
+        if (is_array($GCItem) && is_null($S3Identifier) && is_null($filename)) {
+            if (array_key_exists('filename', $GCItem)) {
+                $S3Identifier = $GCItem['filename'];
+            }
+            if (array_key_exists('original_filename', $GCItem)) {
+                $filename = $GCItem['original_filename'];
+            }
+            if (array_key_exists('id', $GCItem)) {
+                $GCItem = $GCItem['id'];
+            }
+        }
+
+        if ($GCItem && $S3Identifier && $filename) {
+            $fileID = SSGatherContentTools::downloadFileIntoAssetsSubfolder($this->cfg->s3_file_store_url, $S3Identifier, $this->cfg->assets_subfolder, $filename, (bool)$this->cfg->overwrite_files);
+        } else {
+            return false;
+        }
+
+        $file = File::get()->filter(array('ID' => $fileID))->first();
+
+        if ($file && $file->has_extension('SSGatherContentDataExtension')) {
+            $file->GC_storeAllInfo($GCItem);
+        }
+
+        return $fileID;
     }
 
 
