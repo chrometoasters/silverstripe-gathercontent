@@ -464,6 +464,534 @@ class SSGatherContent extends Object {
     }
 
 
+    /**
+     * Import all content and all files from GatherContent into the CMS based on the YAML configuration.
+     *
+     */
+    public function loadContentFromGatherContent() {
+
+        // get mappings and create couple support variables
+        $mappings = $this->cfg->mappings;
+
+        $statuses_IdToName = array(); // map template names to IDs
+        $templates_IdToName = array(); // map template names to IDs
+        $template_to_class = array(); // map template IDs to classes (page types and data objects)
+
+        $templates_order = array();  // order of templates how they should be processed
+
+        $generic_processors_field = $this->cfg->processors['field'];
+        $generic_processors_value = $this->cfg->processors['value'];
+
+        // default mapping?
+        $mappings_default = false;
+        if (array_key_exists('default', $mappings)) {
+            $mappings_default = $mappings['default'];
+
+            foreach($mappings_default as $mapping_class => $mapping_details) {
+
+                // extend the mapping details with some useful information
+                $is_page = is_subclass_of($mapping_class, 'SiteTree');
+                $is_dataObject = !$is_page && is_subclass_of($mapping_class, 'DataObject');
+                $mapping_details['is_page'] = $is_page;
+                $mapping_details['is_do'] = $is_dataObject;
+
+                $mappings_default[$mapping_class] = $mapping_details;
+            }
+        }
+
+        // standard mappings
+        foreach($mappings['classes'] as $mapping_class => $mapping_details) {
+
+            // extend the mapping details with some useful information
+            $is_page = is_subclass_of($mapping_class, 'SiteTree');
+            $is_dataObject = !$is_page && is_subclass_of($mapping_class, 'DataObject');
+            $mapping_details['is_page'] = $is_page;
+            $mapping_details['is_do'] = $is_dataObject;
+
+            if (!array_key_exists($mapping_details['template'], $template_to_class)) {
+                $template_to_class[$mapping_details['template']] = array();
+            }
+            $template_to_class[$mapping_details['template']][$mapping_class] = $mapping_details;
+        }
+
+        // templates order - undefined templates go last as they come from GatherContent
+        if (array_key_exists('template_order', $mappings) && is_array($mappings['template_order'])) {
+              $templates_order = $mappings['template_order'];
+        }
+
+        // accounts
+        $accounts = $this->gcAPI->getAccounts();
+
+        // iterate over accounts and pick only the one we have configured
+        foreach ($accounts as $single_account) {
+            if (strtolower($single_account['slug']) !== strtolower($this->cfg->plugin_api['accountname'])) continue;
+
+            $account_id = $single_account['id'];
+
+            // projects
+            $projects = $this->gcAPI->getProjects($account_id);
+            if ($projects) {
+
+                // iterate over projects and pick only the one we have configured
+                foreach ($projects as $single_project) {
+                    if (strtolower($single_project['name']) !== strtolower($this->cfg->project)) continue;
+
+                    $project_id = $single_project['id'];
+
+                    // get statuses and transform the array to be name indexed
+                    $statuses = $this->gcAPI->getStatuses($project_id);
+                    if ($statuses) {
+                        $statuses_IdToName = SSGatherContentTools::transformArray($statuses, 'id', 'name');
+                    }
+
+                    // get templates and transform the array to be name indexed
+                    $templates = $this->gcAPI->getTemplates($project_id);
+                    if ($templates) {
+                        $templates_IdToName = SSGatherContentTools::transformArray($templates, 'id', 'name');
+                    }
+
+                    $templates_order_orig = $templates_order;
+
+                    // items
+                    $items = $this->gcAPI->getItems($project_id);
+                    if ($items) {
+
+                        while (is_array($templates_order)) {
+
+                            // get first template to process or NULL
+                            $template_limit = array_shift($templates_order);
+
+                            // if no ordered templates, last run, set to false
+                            if ($template_limit === null) {
+                                $templates_order = false;
+                            }
+
+                            // iterate over items
+                            foreach ($items as $single_item) {
+                                $item_id = $single_item['id'];
+                                $item_template_id = $single_item['template_id'];
+
+                                if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
+                                    continue;
+                                } elseif (($template_limit === null) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
+                                    continue;
+                                }
+
+                                $item = $this->gcAPI->getItem($item_id);
+
+                                // get item status and check whether we don't skip items with that status
+                                $item_status_name = $item['status']['data']['name'];
+                                if (in_array($item_status_name, $this->cfg->statuses['skip'])) continue;
+
+                                // get template name
+                                $item_template_name = $templates_IdToName[$item['template_id']];
+
+                                // item specification from config
+                                $item_spec = null;
+                                if (array_key_exists($item_template_name, $template_to_class)) {
+                                    $item_spec = $template_to_class[$item_template_name];
+                                } else {
+                                    if ($mappings_default) {
+                                        $item_spec = $mappings_default;
+                                    }
+                                }
+
+                                if ($item_spec) {
+                                    $item_spec_details = reset($item_spec);
+                                    $item_class = key($item_spec);
+
+                                    // if configured, get class field & value processors
+                                    $item_spec_details_processors = null;
+                                    $item_spec_details_processors_field = array();
+                                    $item_spec_details_processors_value = array();
+                                    if (array_key_exists('processors', $item_spec_details)) {
+                                        $item_spec_details_processors = $item_spec_details['processors'];
+
+                                        // get class related filters from the specification for field name and value
+                                        if (is_array($item_spec_details_processors) && array_key_exists('field', $item_spec_details_processors) && is_array($item_spec_details_processors['field'])) {
+                                            $item_spec_details_processors_field = $item_spec_details_processors['field'];
+                                        }
+                                        if (is_array($item_spec_details_processors) && array_key_exists('value', $item_spec_details_processors) && is_array($item_spec_details_processors['value'])) {
+                                            $item_spec_details_processors_value = $item_spec_details_processors['value'];
+                                        }
+                                    }
+
+                                    // if configured, get class fields
+                                    $item_spec_details_fields = array();
+                                    if (array_key_exists('fields', $item_spec_details)) {
+                                        $item_spec_details_fields = $item_spec_details['fields'];
+                                    }
+
+                                    $item_spec_details_fields_mappings = array();
+                                    $item_spec_details_fields_mappings_cms_to_gc = array();
+                                    // if configured, get class fields mappings
+                                    if (array_key_exists('mappings', $item_spec_details_fields)) {
+                                        $item_spec_details_fields_mappings = $item_spec_details_fields['mappings'];
+                                    }
+
+                                    // if configured, get class skipped fields
+                                    $item_spec_details_fields_skip = array();
+                                    if (array_key_exists('skip', $item_spec_details_fields)) {
+                                        $item_spec_details_fields_skip = $item_spec_details_fields['skip'];
+                                    }
+
+                                    // create an instance of the class to assign data to
+                                    $item_instance = new $item_class();
+
+                                    // get class field configuration from the CMS
+                                    $item_class_db = $item_instance->db();
+                                    $item_class_has_one = $item_instance->has_one();
+                                    $item_class_has_many = $item_instance->has_many();
+                                    $item_class_many_many = $item_instance->many_many();
+                                    $item_class_belong_to = $item_instance->belongs_to();
+
+                                    $item_content = array();
+                                    if (array_key_exists('config', $item)) {
+                                        $item_content = $item['config'];
+                                    }
+
+                                    if (is_array($item_content)) {
+                                        foreach ($item_content as $item_section) {
+
+                                            // elements
+                                            $item_section_elements = array();
+                                            if (array_key_exists('elements', $item_section)) {
+                                                $item_section_elements = $item_section['elements'];
+                                            }
+
+                                            // iterate over section elements if possible
+                                            if (is_array($item_section_elements)) {
+                                                foreach ($item_section_elements as $item_section_element) {
+
+                                                    if (is_array($item_section_element)) {
+
+                                                        $item_section_element_type = $item_section_element['type'];  // field type
+
+                                                        // skip guidelines, they don't carry any content
+                                                        if ($item_section_element_type === 'section') {
+                                                            continue;
+                                                        }
+                                                        $item_section_element_name = $item_section_element['label']; // field name
+                                                        $item_section_element_value = null; // field value
+
+                                                        // check if the field is in the skip config
+                                                        if (is_array($item_spec_details_fields_skip) && in_array($item_section_element_name, $item_spec_details_fields_skip)) {
+                                                            continue;
+                                                        }
+
+                                                        // field cms mapping and processors variables init
+                                                        $item_spec_details_fields_mappings_field = null;
+                                                        $item_spec_details_field_mappings_lookup = null;
+                                                        $item_spec_details_field_mappings_lookup_field = 'Title';
+                                                        $item_spec_details_field_mappings_lookup_create = false;
+                                                        $item_spec_details_field_processors_field = array();
+                                                        $item_spec_details_field_processors_value = array();
+                                                        $item_spec_details_field_translations = array();
+
+                                                        // set variables based on item specification
+                                                        if (is_array($item_spec_details_fields_mappings) && array_key_exists($item_section_element_name, $item_spec_details_fields_mappings)) {
+                                                            // get string mapping or array of parameters for the field
+                                                            $item_spec_details_fields_mappings_field = $item_spec_details_fields_mappings[$item_section_element_name];
+
+                                                            // if we've got an array, we may have processors and cms mapping
+                                                            if (is_array($item_spec_details_fields_mappings_field)) {
+
+                                                                // get processors, if defined
+                                                                if (array_key_exists('processors', $item_spec_details_fields_mappings_field)) {
+                                                                    $item_spec_details_field_processors = $item_spec_details_fields_mappings_field['processors'];
+
+                                                                    // get class related filters from the specification for field name and value
+                                                                    if (is_array($item_spec_details_field_processors) && array_key_exists('field', $item_spec_details_field_processors) && is_array($item_spec_details_field_processors['field'])) {
+                                                                        $item_spec_details_field_processors_field = $item_spec_details_field_processors['field'];
+                                                                    }
+                                                                    if (is_array($item_spec_details_field_processors) && array_key_exists('value', $item_spec_details_field_processors) && is_array($item_spec_details_field_processors['value'])) {
+                                                                        $item_spec_details_field_processors_value = $item_spec_details_field_processors['value'];
+                                                                    }
+                                                                }
+
+                                                                // get lookup field, if defined, defaulting to 'Title', for items, that need to lookup
+                                                                //their value based on the provided value, like has_one, has_many or many_many
+                                                                if (array_key_exists('lookup', $item_spec_details_fields_mappings_field)) {
+                                                                    $item_spec_details_field_mappings_lookup = $item_spec_details_fields_mappings_field['lookup'];
+                                                                }
+
+                                                                // get translations for the field, if defined as an array
+                                                                if (array_key_exists('translations', $item_spec_details_fields_mappings_field) && is_array($item_spec_details_fields_mappings_field['translations'])) {
+                                                                    $item_spec_details_field_translations = $item_spec_details_fields_mappings_field['translations'];
+                                                                }
+
+                                                                // get cms mapping, if defined, overwriting the variable, therefore it has to be last in this block
+                                                                if (array_key_exists('cms', $item_spec_details_fields_mappings_field)) {
+                                                                    $item_spec_details_fields_mappings_field = $item_spec_details_fields_mappings_field['cms'];
+                                                                }
+
+                                                            }
+                                                        }
+
+                                                        // determine element type and collect value based on the type
+                                                        switch ($item_section_element_type) {
+                                                            case 'text':
+                                                                // get the value
+                                                                $item_section_element_value = $item_section_element['value'];
+
+                                                                break;
+
+                                                            case 'choice_radio':
+                                                                // iterate over options and pick single (first) item with selected == true
+                                                                $item_section_element_options = $item_section_element['options'];
+                                                                foreach ($item_section_element_options as $item_section_element_option) {
+                                                                    if ($item_section_element_option['selected']) {
+                                                                        $item_section_element_value = $item_section_element_option['label'];
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                break;
+
+                                                            case 'choice_checkbox':
+                                                                // iterate over options, pick items with selected == true and add them to an array
+                                                                $item_section_element_value = array();
+                                                                $item_section_element_options = $item_section_element['options'];
+
+                                                                foreach ($item_section_element_options as $item_section_element_option) {
+                                                                    if ($item_section_element_option['selected']) {
+                                                                        $item_section_element_value[] = $item_section_element_option['label'];
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                break;
+
+                                                            case 'files':
+                                                                // download file info from the API based on the field's GC name (identifier)
+                                                                $item_section_element_value = $this->gcAPI->getFileByItemAndField($item_id, $item_section_element['name']);
+
+                                                                break;
+                                                        }
+
+                                                        // if we have configured exact mapping, use that
+                                                        if ($item_spec_details_fields_mappings_field !== null) {
+                                                            $item_section_element_field = $item_spec_details_fields_mappings_field;
+
+                                                            // apply filters to the field name otherwise
+                                                        } else {
+
+                                                            // apply generic filters to the field name
+                                                            $item_section_element_name = SSGatherContentTools::applyTransformationFilters($generic_processors_field, $item_section_element_name);
+                                                            // apply class specific filters to the field name
+                                                            $item_section_element_name = SSGatherContentTools::applyTransformationFilters($item_spec_details_processors_field, $item_section_element_name);
+                                                            // apply field specific filters to the field name
+                                                            $item_section_element_name = SSGatherContentTools::applyTransformationFilters($item_spec_details_field_processors_field, $item_section_element_name);
+
+                                                            // cms destination field
+                                                            $item_section_element_field = $item_section_element_name;
+                                                        }
+
+                                                        // apply filters to the value if it's not a file
+                                                        if ($item_section_element_type !== 'files') {
+
+                                                            // apply generic filters to the field value
+                                                            $item_section_element_value = SSGatherContentTools::applyTransformationFilters($generic_processors_value, $item_section_element_value);
+                                                            // apply class specific filters to the field value
+                                                            $item_section_element_value = SSGatherContentTools::applyTransformationFilters($item_spec_details_processors_value, $item_section_element_value);
+                                                            // apply field specific filters to the field value
+                                                            $item_section_element_value = SSGatherContentTools::applyTransformationFilters($item_spec_details_field_processors_value, $item_section_element_value);
+                                                        }
+
+                                                        // apply translation, if defined. pick the first matching
+                                                        if (!empty($item_spec_details_field_translations)) {
+                                                            foreach ($item_spec_details_field_translations as $translate_from => $translate_to) {
+                                                                if ($item_section_element_value === $translate_from) {
+                                                                    $item_section_element_value = $translate_to;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        $has_matching_property = false;
+                                                        $has_set_value = false;
+
+                                                        if (array_key_exists($item_section_element_field, $item_class_db)) {
+
+                                                            if (strpos(strtolower($item_section_element_field), 'enum') === 0) {
+                                                                // TODO add check for the value
+
+                                                                if ($item_section_element_value) {
+                                                                    $item_instance->$item_section_element_field = $item_section_element_value;
+                                                                    $has_set_value = true;
+                                                                }
+
+                                                            } else {
+
+                                                                if (($item_class_db[$item_section_element_field] === 'MultiValueField') || (is_subclass_of($item_class_db[$item_section_element_field], 'MultiValueField'))) {
+                                                                    if ($item_section_element_value && !is_array($item_section_element_value)) {
+                                                                        $item_section_element_value = array($item_section_element_value);
+                                                                    }
+                                                                }
+
+                                                                if ($item_section_element_value) {
+                                                                    $item_instance->$item_section_element_field = $item_section_element_value;
+                                                                    $has_set_value = true;
+                                                                }
+
+                                                            }
+
+                                                            $has_matching_property = true;
+                                                        }
+
+
+                                                        // define lookup options
+                                                        if ($item_spec_details_field_mappings_lookup) {
+                                                            if (is_array($item_spec_details_field_mappings_lookup)) {
+                                                                if (array_key_exists('field', $item_spec_details_field_mappings_lookup)) {
+                                                                    $item_spec_details_field_mappings_lookup_field = $item_spec_details_field_mappings_lookup['field'];
+                                                                }
+                                                                if (array_key_exists('create', $item_spec_details_field_mappings_lookup)) {
+                                                                    $item_spec_details_field_mappings_lookup_create = $item_spec_details_field_mappings_lookup['create'];
+                                                                }
+                                                            } else {
+                                                                $item_spec_details_field_mappings_lookup_field = $item_spec_details_field_mappings_lookup;
+                                                            }
+                                                        }
+
+                                                        if (array_key_exists($item_section_element_field, $item_class_has_one)) {
+                                                            // TODO check whether the item exists before linking, if not file
+
+                                                            if ($item_section_element_type !== 'files') {
+                                                                $has_one_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value, $item_class_has_one[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
+
+                                                                if ($has_one_item) {
+                                                                    $item_instance->{$item_section_element_field . 'ID'} = $has_one_item->ID;
+                                                                    $has_set_value = true;
+                                                                }
+
+                                                            } else {
+                                                                // if file from GC, check if we have the file, if not -> download, and link by ID
+                                                                $has_one_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                if ($has_one_file) {
+                                                                    $item_instance->$item_section_element_field = $has_one_file->ID;
+                                                                    $has_set_value = true;
+                                                                } else {
+                                                                    $has_one_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                    if ($has_one_fileID) {
+                                                                        $item_instance->{$item_section_element_field . 'ID'} = $has_one_fileID;
+                                                                        $has_set_value = true;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            $has_matching_property = true;
+                                                        }
+                                                        if (array_key_exists($item_section_element_field, $item_class_has_many)) {
+                                                            // TODO check whether the item exists before linking, if not file
+
+                                                            if ($item_section_element_type !== 'files') {
+                                                                if (!is_array($item_section_element_value)) {
+                                                                    if (trim($item_section_element_value)) {
+                                                                        $item_section_element_value = array($item_section_element_value);
+                                                                    } else {
+                                                                        $item_section_element_value = array();
+                                                                    }
+                                                                }
+                                                                foreach ($item_section_element_value as $item_section_element_value_item) {
+                                                                    $has_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_has_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
+                                                                    if ($has_many_item) {
+                                                                        $item_instance->$item_section_element_field()->add($has_many_item);
+                                                                        $has_set_value = true;
+                                                                    }
+                                                                }
+
+                                                            } else {
+                                                                // if file from GC, check if we have the file, if not -> download, and link by ID
+                                                                $has_many_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                if ($has_many_file) {
+                                                                    $item_instance->$item_section_element_field->add($has_many_file);
+                                                                    $has_set_value = true;
+                                                                } else {
+                                                                    $has_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                    if ($has_many_fileID) {
+                                                                        $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
+                                                                        $has_set_value = true;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            $has_matching_property = true;
+                                                        }
+                                                        if (array_key_exists($item_section_element_field, $item_class_many_many)) {
+                                                            // TODO check whether the item exists before linking, if not file
+
+                                                            if ($item_section_element_type !== 'files') {
+                                                                if (!is_array($item_section_element_value)) {
+                                                                    if (trim($item_section_element_value)) {
+                                                                        $item_section_element_value = array($item_section_element_value);
+                                                                    } else {
+                                                                        $item_section_element_value = array();
+                                                                    }
+                                                                }
+
+                                                                foreach ($item_section_element_value as $item_section_element_value_item) {
+                                                                    $many_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_many_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
+                                                                    if ($many_many_item) {
+                                                                        $item_instance->$item_section_element_field()->add($many_many_item);
+                                                                        $has_set_value = true;
+                                                                    }
+                                                                }
+
+                                                            } else {
+                                                                // if file from GC, check if we have the file, if not -> download, and link by ID
+                                                                $many_many_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                if ($many_many_file) {
+                                                                    $item_instance->$item_section_element_field->add($many_many_file);
+                                                                } else {
+                                                                    $many_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                    if ($many_many_fileID) {
+                                                                        $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
+                                                                        $has_set_value = true;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            $has_matching_property = true;
+                                                        }
+
+                                                    }
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                    };
+
+                                    if ($item_instance instanceof SiteTree) {
+                                        $item_instance->ParentID = 0;
+                                        $item_instance->write();
+                                        $item_instance->doRestoreToStage();
+                                        $item_instance->doPublish();
+                                    } else {
+                                        $item_instance->write();
+                                    }
+
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+
 
 
 }
