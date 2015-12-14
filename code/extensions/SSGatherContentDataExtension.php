@@ -118,4 +118,18 @@ class SSGatherContentDataExtension extends DataExtension {
     }
 
 
+    /**
+     * Wrapper function to store ID and created and last updated dates in one go
+     *
+     * @param int|string $id                    ID
+     * @param string|null $dateCreated          'created' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
+     * @param string|null $dateLastUpdated      'last updated' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
+     */
+    public function GC_storeAllInfo($id, $dateCreated = null, $dateLastUpdated = null) {
+        $this->owner->GC_storeItemID($id);
+        $this->owner->GC_storeDateCreated($dateCreated);
+        $this->owner->GC_storeDateLastUpdated($dateLastUpdated);
+    }
+
+
 }
