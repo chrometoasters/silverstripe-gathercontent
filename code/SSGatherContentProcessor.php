@@ -116,8 +116,8 @@ class SSGatherContentProcessor extends Object {
         $args = func_get_args();
         $value = $args[0];
 
-        // only if we've got an array
-        if (is_array($value)) {
+        // only if we've got an array with some values
+        if (is_array($value) && count($value)) {
             $value = $value[0];
         }
 
