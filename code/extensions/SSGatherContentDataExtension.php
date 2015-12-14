@@ -26,6 +26,7 @@ class SSGatherContentDataExtension extends DataExtension {
      */
     private static $db = array(
         'GC_ID'                 => 'Varchar(100)',
+        'GC_ParentID'           => 'Varchar(100)',
         'GC_DateCreated'        => 'SS_DateTime',
         'GC_DateLastUpdated'    => 'SS_DateTime',
         'GC_Log'                => 'Text',
@@ -48,6 +49,7 @@ class SSGatherContentDataExtension extends DataExtension {
             // add fields
             $fields->addFieldsToTab('Root.GatherContent', array(
                 ReadonlyField::create('GC_ID', 'Item ID'),
+                ReadonlyField::create('GC_ParentID', 'Parent item ID'),
                 ReadonlyField::create('GC_DateCreated', 'Date imported from GatherContent'),
                 ReadonlyField::create('GC_DateLastUpdated', 'Date updated from GatherContent'),
                 TextareaField::create('GC_Log', 'Log')->setRows(10)->performReadonlyTransformation(),
@@ -56,6 +58,7 @@ class SSGatherContentDataExtension extends DataExtension {
         } else {
         // hide fields if not SiteTree
             $fields->removeByName('GC_ID');
+            $fields->removeByName('GC_ParentID');
             $fields->removeByName('GC_DateCreated');
             $fields->removeByName('GC_DateLastUpdated');
             $fields->removeByName('GC_Log');
@@ -71,6 +74,16 @@ class SSGatherContentDataExtension extends DataExtension {
      */
     public function GC_storeItemID($id) {
         $this->owner->GC_ItemID = $id;
+    }
+
+
+    /**
+     * Store GatherContent parent item's ID
+     *
+     * @param int|string $id        ID
+     */
+    public function GC_storeParentItemID($id) {
+        $this->owner->GC_ParentID = $id;
     }
 
 
@@ -119,14 +132,16 @@ class SSGatherContentDataExtension extends DataExtension {
 
 
     /**
-     * Wrapper function to store ID and created and last updated dates in one go
+     * Wrapper function to store ID, ParentID and created and last updated dates in one go
      *
      * @param int|string $id                    ID
+     * @param int|string|null $parentId         Parent ID
      * @param string|null $dateCreated          'created' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
      * @param string|null $dateLastUpdated      'last updated' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
      */
-    public function GC_storeAllInfo($id, $dateCreated = null, $dateLastUpdated = null) {
+    public function GC_storeAllInfo($id, $parentId = null, $dateCreated = null, $dateLastUpdated = null) {
         $this->owner->GC_storeItemID($id);
+        $this->owner->GC_storeParentItemID($parentId);
         $this->owner->GC_storeDateCreated($dateCreated);
         $this->owner->GC_storeDateLastUpdated($dateLastUpdated);
     }
