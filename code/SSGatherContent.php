@@ -888,7 +888,7 @@ class SSGatherContent extends Object {
 
                                                             } else {
                                                                 // if file from GC, check if we have the file, if not -> download, and link by ID
-                                                                $has_one_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                $has_one_file = SSGatherContentTools::getItemByGCUniqueIdentifier($item_section_element_value['id'], $this->cfg->unique_identifier, 'File');
                                                                 if ($has_one_file) {
                                                                     $item_instance->$item_section_element_field = $has_one_file->ID;
                                                                     $has_set_value = true;
@@ -926,7 +926,7 @@ class SSGatherContent extends Object {
 
                                                             } else {
                                                                 // if file from GC, check if we have the file, if not -> download, and link by ID
-                                                                $has_many_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                $has_many_file = SSGatherContentTools::getItemByGCUniqueIdentifier($item_section_element_value['id'], $this->cfg->unique_identifier, 'File');
                                                                 if ($has_many_file) {
                                                                     $item_instance->$item_section_element_field->add($has_many_file);
                                                                     $has_set_value = true;
@@ -965,7 +965,7 @@ class SSGatherContent extends Object {
 
                                                             } else {
                                                                 // if file from GC, check if we have the file, if not -> download, and link by ID
-                                                                $many_many_file = SSGatherContentTools::getItemByGCID($item_section_element_value['id'], 'File');
+                                                                $many_many_file = SSGatherContentTools::getItemByGCUniqueIdentifier($item_section_element_value['id'], $this->cfg->unique_identifier, 'File');
                                                                 if ($many_many_file) {
                                                                     $item_instance->$item_section_element_field->add($many_many_file);
                                                                 } else {
