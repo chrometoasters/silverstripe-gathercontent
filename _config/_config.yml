@@ -26,7 +26,7 @@ SSGatherContent:
   overwrite_files: false
   allow_publish: false
 
-  unique_identifier: GC_ItemID
+  unique_identifier: GC_ID
 
   processors:
     field: []
