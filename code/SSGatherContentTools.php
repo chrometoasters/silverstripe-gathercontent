@@ -378,7 +378,7 @@ class SSGatherContentTools extends Object {
      * @param bool|false $create        whether to create the item if it wasn't found
      * @return mixed|null               null when not found or failed creating, CMS item itself if found
      */
-    public static function getItemByLookupField($field, $value, $class = 'SiteTree', $create = false) {
+    public static function getItemByLookupField($field, $value, $class = 'SiteTree', $create = false, $publishCreated = false) {
 
         $item = $class::get()->filter(array($field => $value));
 
@@ -394,8 +394,16 @@ class SSGatherContentTools extends Object {
                 $item->$field = $value;
                 if (is_subclass_of($class, 'SiteTree')) {
                     $item->ParentID = 0; // top level
+                    $item->write();
+
+                    if ($publishCreated) {
+                        $item->publish('Stage', 'Live');
+                        $item->doRestoreToStage();
+                    }
+
+                } else {
+                    $item->write();
                 }
-                $item->write();
 
                 return $item;
             } catch (Exception $ex) {
