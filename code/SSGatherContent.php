@@ -643,6 +643,23 @@ class SSGatherContent extends Object {
                                         $item_spec_details_fields = $item_spec_details['fields'];
                                     }
 
+                                    // if configured, get class parent item definition
+                                    $item_spec_details_parent = array();
+                                    $item_spec_details_parent_class = null;
+                                    $item_spec_details_parent_title = null;
+                                    if (array_key_exists('parent', $item_spec_details)) {
+                                        $item_spec_details_parent = $item_spec_details['parent'];
+
+                                        // get class related parent item class and title
+                                        if (is_array($item_spec_details_parent) && array_key_exists('class', $item_spec_details_parent)) {
+                                            $item_spec_details_parent_class = $item_spec_details_parent['class'];
+                                        }
+                                        if (is_array($item_spec_details_parent) && array_key_exists('title', $item_spec_details_parent)) {
+                                            $item_spec_details_parent_title = $item_spec_details_parent['title'];
+                                        }
+
+                                    }
+
                                     $item_spec_details_fields_mappings = array();
                                     $item_spec_details_fields_mappings_cms_to_gc = array();
                                     // if configured, get class fields mappings
@@ -1001,6 +1018,15 @@ class SSGatherContent extends Object {
                                     }; // if is_array($item_content)
 
                                     if ($item_instance instanceof SiteTree) {
+
+                                        // if class and title provided, try to find or create parent item
+                                        if (($item_spec_details_parent_class !== null) && is_subclass_of($item_spec_details_parent_class, 'SiteTree') && $item_spec_details_parent_title) {
+                                            $parent = SSGatherContentTools::getItemByLookupField('Title', $item_spec_details_parent_title, $item_spec_details_parent_class, true, $this->cfg->allow_publish);
+                                            if ($parent && $parent->ID) {
+                                                $item_instance->ParentID = $parent->ID;
+                                            }
+                                        }
+
                                         $item_instance->write();
                                         if ($this->cfg->allow_publish) {
                                             $item_instance->publish('Stage', 'Live');
@@ -1011,7 +1037,6 @@ class SSGatherContent extends Object {
                                     }
 
                                 } // if ($item_spec)
-
 
                             } // foreach ($items)
 
