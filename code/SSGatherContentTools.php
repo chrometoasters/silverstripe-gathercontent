@@ -407,16 +407,17 @@ class SSGatherContentTools extends Object {
 
 
     /**
-     * Lookup CMS item of given class based on GatherContent stored ID
+     * Lookup CMS item of given class based on GatherContent stored ID (field defined in the config)
      *
      * This function uses more generic SSGatherContentTools::getItemByLookupField() with some predefined parameters.
      *
      * @param string $id                GatherContent ID
+     * @param string $uniqueIdentifier  SSGatherContentDataExtension primary ID's field name coming from the config
      * @param string $class             class of the item
      * @return mixed|null               CMS item itself OR null when not found
      */
-    public static function getItemByGCID($id, $class = 'SiteTree') {
-        return SSGatherContentTools::getItemByLookupField('GC_ID', $id, $class, false);
+    public static function getItemByGCUniqueIdentifier($id, $uniqueIdentifier, $class = 'SiteTree') {
+        return SSGatherContentTools::getItemByLookupField($uniqueIdentifier, $id, $class, false);
     }
 
 
