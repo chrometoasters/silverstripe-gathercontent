@@ -392,6 +392,9 @@ class SSGatherContentTools extends Object {
             try {
                 $item = new $class();
                 $item->$field = $value;
+                if (is_subclass_of($class, 'SiteTree')) {
+                    $item->ParentID = 0; // top level
+                }
                 $item->write();
 
                 return $item;
