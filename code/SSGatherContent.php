@@ -881,10 +881,12 @@ class SSGatherContent extends Object {
                                                                     $item_instance->$item_section_element_field = $has_one_file->ID;
                                                                     $has_set_value = true;
                                                                 } else {
-                                                                    $has_one_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
-                                                                    if ($has_one_fileID) {
-                                                                        $item_instance->{$item_section_element_field . 'ID'} = $has_one_fileID;
-                                                                        $has_set_value = true;
+                                                                    if ($this->cfg->download_files) {
+                                                                        $has_one_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                        if ($has_one_fileID) {
+                                                                            $item_instance->{$item_section_element_field . 'ID'} = $has_one_fileID;
+                                                                            $has_set_value = true;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -917,10 +919,12 @@ class SSGatherContent extends Object {
                                                                     $item_instance->$item_section_element_field->add($has_many_file);
                                                                     $has_set_value = true;
                                                                 } else {
-                                                                    $has_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
-                                                                    if ($has_many_fileID) {
-                                                                        $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
-                                                                        $has_set_value = true;
+                                                                    if ($this->cfg->download_files) {
+                                                                        $has_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                        if ($has_many_fileID) {
+                                                                            $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
+                                                                            $has_set_value = true;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -953,10 +957,12 @@ class SSGatherContent extends Object {
                                                                 if ($many_many_file) {
                                                                     $item_instance->$item_section_element_field->add($many_many_file);
                                                                 } else {
-                                                                    $many_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
-                                                                    if ($many_many_fileID) {
-                                                                        $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
-                                                                        $has_set_value = true;
+                                                                    if ($this->cfg->download_files) {
+                                                                        $many_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+                                                                        if ($many_many_fileID) {
+                                                                            $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
+                                                                            $has_set_value = true;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
