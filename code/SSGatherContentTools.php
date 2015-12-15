@@ -394,8 +394,6 @@ class SSGatherContentTools extends Object {
                 $item->$field = $value;
                 $item->write();
 
-                var_dump("created $class with field $field and value $value");
-
                 return $item;
             } catch (Exception $ex) {
                 return null;
