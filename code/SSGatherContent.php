@@ -587,10 +587,13 @@ class SSGatherContent extends Object {
                                 $item_id = $single_item['id'];
                                 $item_template_id = $single_item['template_id'];
 
+                                // not the current template?
                                 if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
                                     continue;
+                                // already processed template?
                                 } elseif (($template_limit === null) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
                                     continue;
+                                // skipped template?
                                 } elseif (in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
                                     continue;
                                 }
@@ -979,15 +982,15 @@ class SSGatherContent extends Object {
                                                             $has_matching_property = true;
                                                         }
 
-                                                    }
+                                                    } // if is_array($item_section_element)
 
-                                                }
+                                                } // foreach ($item_section_elements)
 
-                                            }
+                                            } // if is_array($item_section_elements)
 
-                                        }
+                                        } // foreach ($item_content)
 
-                                    };
+                                    }; // if is_array($item_content)
 
                                     if ($item_instance instanceof SiteTree) {
                                         $item_instance->ParentID = 0;
@@ -998,20 +1001,20 @@ class SSGatherContent extends Object {
                                         $item_instance->write();
                                     }
 
+                                } // if ($item_spec)
 
-                                }
 
-                            }
+                            } // foreach ($items)
 
-                        }
+                        } // while (is_array($templates_order))
 
-                    }
+                    } // if ($items)
 
-                }
+                } // foreach ($projects)
 
-            }
+            } // if ($projects)
 
-        }
+        } // foreach ($accounts)
 
     }
 
