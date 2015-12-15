@@ -25,6 +25,7 @@ SSGatherContent:
   update_existing: true
   overwrite_files: false
   allow_publish: false
+  download_files: true
 
   unique_identifier: GC_ID
 

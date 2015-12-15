@@ -139,6 +139,15 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Determine whether to download files uploaded to GatherContent and linked to content items.
+     *
+     * @var bool
+     * @config
+     */
+    private static $download_files;
+
+
+    /**
      * Unique identifier in the CMS that the module can use to determine whether the item already exists in the CMS
      * and we need to check if we can overwrite it or not
      *
