@@ -819,12 +819,20 @@ class SSGatherContent extends Object {
                                                             $item_section_element_value = SSGatherContentTools::applyTransformationFilters($item_spec_details_field_processors_value, $item_section_element_value);
                                                         }
 
-                                                        // apply translation, if defined. pick the first matching
+                                                        // apply translation, if defined. pick the first matching, but iterate over array
                                                         if (!empty($item_spec_details_field_translations)) {
                                                             foreach ($item_spec_details_field_translations as $translate_from => $translate_to) {
-                                                                if ($item_section_element_value === $translate_from) {
-                                                                    $item_section_element_value = $translate_to;
-                                                                    break;
+                                                                if (!is_array($item_section_element_value)) {
+                                                                    if ($item_section_element_value === $translate_from) {
+                                                                        $item_section_element_value = $translate_to;
+                                                                        break;
+                                                                    }
+                                                                } else {
+                                                                    foreach ($item_section_element_value as $key => $item_section_element_value_item) {
+                                                                        if ($item_section_element_value_item === $translate_from) {
+                                                                            $item_section_element_value[$key] = $translate_to;
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
                                                         }
