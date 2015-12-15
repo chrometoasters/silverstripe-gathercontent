@@ -488,6 +488,8 @@ class SSGatherContent extends Object {
 
         $templates_order = array();  // order of templates how they should be processed
 
+        $skipped_templates = array(); // do we skip some GC templates?
+
         $generic_processors_field = $this->cfg->processors['field'];
         $generic_processors_value = $this->cfg->processors['value'];
 
@@ -526,6 +528,11 @@ class SSGatherContent extends Object {
         // templates order - undefined templates go last as they come from GatherContent
         if (array_key_exists('template_order', $mappings) && is_array($mappings['template_order'])) {
               $templates_order = $mappings['template_order'];
+        }
+
+        // skipped templates - templates we don't load from GatherContent at all
+        if (array_key_exists('skipped_templates', $mappings) && is_array($mappings['skipped_templates'])) {
+            $skipped_templates = $mappings['skipped_templates'];
         }
 
         // accounts
@@ -583,6 +590,8 @@ class SSGatherContent extends Object {
                                 if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
                                     continue;
                                 } elseif (($template_limit === null) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
+                                    continue;
+                                } elseif (in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
                                     continue;
                                 }
 
