@@ -993,10 +993,11 @@ class SSGatherContent extends Object {
                                     }; // if is_array($item_content)
 
                                     if ($item_instance instanceof SiteTree) {
-                                        $item_instance->ParentID = 0;
                                         $item_instance->write();
-                                        $item_instance->doRestoreToStage();
-                                        $item_instance->doPublish();
+                                        if ($this->cfg->allow_publish) {
+                                            $item_instance->publish('Stage', 'Live');
+                                            $item_instance->doRestoreToStage();
+                                        }
                                     } else {
                                         $item_instance->write();
                                     }
