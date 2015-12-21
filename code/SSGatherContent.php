@@ -654,10 +654,10 @@ class SSGatherContent extends Object {
                                 if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
                                     continue;
                                 // already processed template?
-                                } elseif (($template_limit === null) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
+                                } elseif (($template_limit === null) && count($templates_order_orig) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
                                     continue;
                                 // skipped template?
-                                } elseif (in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
+                                } elseif (count($skipped_templates) && in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
                                     continue;
                                 // already processed?
                                 } elseif ($single_item['SSGC_processed']) {
