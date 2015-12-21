@@ -632,6 +632,7 @@ class SSGatherContent extends Object {
                             // iterate over items
                             foreach ($items as $single_item) {
                                 $item_id = $single_item['id'];
+                                $item_parent_id = $single_item['parent_id'];
                                 $item_template_id = $single_item['template_id'];
 
                                 // not the current template?
@@ -1070,6 +1071,10 @@ class SSGatherContent extends Object {
                                         } // foreach ($item_content)
 
                                     }; // if is_array($item_content)
+
+                                    if ($item_instance->hasExtension('SSGatherContentDataExtension')) {
+                                        $item_instance->GC_storeAllInfo($item_id, $item_parent_id);
+                                    }
 
                                     if ($item_instance instanceof SiteTree) {
 
