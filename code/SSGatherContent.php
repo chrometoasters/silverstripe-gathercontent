@@ -112,7 +112,7 @@ class SSGatherContent extends Object {
      * Determine how to treat existing items (based on GatherContent unique item id) - overwrite or skip existing
      * CMS items by items from GatherContent, or create new ones
      *
-     * Value can be 'skip', 'update' or 'new', performing action as the constant suggests.
+     * Value can be 'skip', 'update', 'new' or 'replace', performing action as the constant suggests. Replace deletes the item and recreates it.
      *
      * If any other value is used, fallback is 'new'.
      *
@@ -324,8 +324,8 @@ class SSGatherContent extends Object {
 
 
         // check configuration of process_existing setting
-        if (!is_string($this->cfg->process_existing) || !in_array(strtolower($this->cfg->process_existing), array('new', 'skip', 'update'))) {
-            throw new Exception('Existing items processing mode (config key "process_existing") has to be set to one of these options: new, skip, update.');
+        if (!is_string($this->cfg->process_existing) || !in_array(strtolower($this->cfg->process_existing), array('new', 'skip', 'update', 'replace'))) {
+            throw new Exception('Existing items processing mode (config key "process_existing") has to be set to one of these options: new, skip, update or replace.');
         }
 
 
@@ -691,7 +691,7 @@ class SSGatherContent extends Object {
                                     $item_instance = SSGatherContentTools::getItemByGCUniqueIdentifier($this->cfg->unique_identifier, $item_id, $item_class);
 
                                     // if the item exists and we don't have to create a new one
-                                    if (($item_instance instanceof $item_class) && ($item_instance->exists()) && ($this->cfg->process_existing !== 'new')) {
+                                    if ((in_array($this->cfg->process_existing, array('skip', 'update'))) && ($item_instance instanceof $item_class) && ($item_instance->exists())) {
 
                                         // skip existing?
                                         if ($this->cfg->process_existing === 'skip') {
@@ -703,7 +703,17 @@ class SSGatherContent extends Object {
                                             $item_update = true;
                                         }
 
-                                    // item doesn't exist or force create new instance
+                                    // item exists but we may need a new one?
+                                    } elseif ((in_array($this->cfg->process_existing, array('replace', 'new'))) && ($item_instance instanceof $item_class) && ($item_instance->exists())) {
+
+                                        // replace?
+                                        if ($this->cfg->process_existing === 'replace') {
+                                            $item_instance->delete();
+                                        }
+
+                                        $item_instance = new $item_class();
+
+                                    // item doesn't exist
                                     } else {
                                         $item_instance = new $item_class();
                                     }
