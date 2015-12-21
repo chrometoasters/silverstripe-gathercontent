@@ -302,24 +302,47 @@ class SSGatherContentTools extends Object {
      * @param string|null $keyKey               key from the above array's item to be used as index for the product array OR null to not transform the key
      * @param string|null $valueKey             key from the above array's item to define the values for the product array OR null to use whole item
      * @param boolean|false $transformToArrays  determine whether to create array of nested items - useful for arrays with duplicate keys coming from keyKey value
+     * @param boolean|callable|false $keyCb     callback to be applied to a key before using it
+     * @param boolean|callable|false $valueCb   callback to be applied to a value before outputting it
      * @return string                           "flattened" array
      */
-    public static function transformArray($array, $keyKey = null, $valueKey = null, $transformToArrays = false) {
+    public static function transformArray($array, $keyKey = null, $valueKey = null, $transformToArrays = false, $keyCb = false, $valueCb = false) {
 
         if (is_array($array)) {
             foreach ($array as $key => $item) {
+
+                $outputValue = ($valueKey ? $item[$valueKey] : $item);
+                if ($valueCb && is_callable($valueCb)) {
+                    $outputValue = call_user_func($valueCb, $outputValue);
+                }
+
                 if ($keyKey && is_array($item) && array_key_exists($keyKey, $item)) {
+
+                    $outputKey = $item[$keyKey];
+                    if ($keyCb && is_callable($keyCb)) {
+                        $outputKey = call_user_func($keyCb, $outputKey);
+                    }
                     if ($transformToArrays) {
-                        if (!array_key_exists($item[$keyKey], $array)) {
-                            $array[$item[$keyKey]] = array();
+                        if (!array_key_exists($outputKey, $array)) {
+                            $array[$outputKey] = array();
                         }
-                        $array[$item[$keyKey]][$key] = ($valueKey ? $item[$valueKey] : $item);
+                        $array[$outputKey][$key] = ($valueKey ? $item[$valueKey] : $item);
                     } else {
-                        $array[$item[$keyKey]] = ($valueKey ? $item[$valueKey] : $item);
+                        $array[$outputKey] = ($valueKey ? $item[$valueKey] : $item);
                     }
                     unset($array[$key]);
+
                 } else {
-                    $array[$key] = ($valueKey ? $item[$valueKey] : $item);
+
+                    if ($keyCb && is_callable($keyCb)) {
+                        $outputKey = call_user_func($keyCb, $key);
+
+                        $array[$outputKey] = $outputValue;
+                        unset($array[$key]);
+                    } else {
+                        $array[$key] = $outputValue;
+                    }
+
                 }
             }
         }
