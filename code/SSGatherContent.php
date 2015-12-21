@@ -765,10 +765,14 @@ class SSGatherContent extends Object {
                                     }
 
                                     $item_spec_details_fields_mappings = array();
-                                    $item_spec_details_fields_mappings_cms_to_gc = array();
+                                    $item_spec_details_fields_mappings_super = array();
                                     // if configured, get class fields mappings
                                     if (array_key_exists('mappings', $item_spec_details_fields)) {
                                         $item_spec_details_fields_mappings = $item_spec_details_fields['mappings'];
+                                    }
+                                    // if configured, get class fields super_mappings
+                                    if (array_key_exists('super_mappings', $item_spec_details_fields)) {
+                                        $item_spec_details_fields_mappings_super = $item_spec_details_fields['super_mappings'];
                                     }
 
                                     // if configured, get class skipped fields
@@ -783,6 +787,17 @@ class SSGatherContent extends Object {
                                     $item_class_has_many = $item_instance->has_many();
                                     $item_class_many_many = $item_instance->many_many();
                                     $item_class_belong_to = $item_instance->belongs_to();
+
+                                    // process super mappings if some, no processors, only 1-1 mapping, only db fields
+                                    if (is_array($item_spec_details_fields_mappings_super)) {
+                                        foreach ($item_spec_details_fields_mappings_super as $item_spec_details_fields_mappings_super_field => $item_spec_details_fields_mappings_super_field_mapping) {
+                                            if (array_key_exists($item_spec_details_fields_mappings_super_field_mapping, $item_class_db)) {
+                                                if (array_key_exists($item_spec_details_fields_mappings_super_field, $item)) {
+                                                    $item_instance->$item_spec_details_fields_mappings_super_field_mapping = $item[$item_spec_details_fields_mappings_super_field];
+                                                }
+                                            }
+                                        }
+                                    }
 
                                     $item_content = array();
                                     if (array_key_exists('config', $item)) {
