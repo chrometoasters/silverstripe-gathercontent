@@ -22,7 +22,7 @@ SSGatherContent:
   suffix_backup_with_datetime: true
   save_json_files: false
   use_saved_json_files: false
-  update_existing: true
+  process_existing: update
   overwrite_files: false
   allow_publish: false
   download_files: true

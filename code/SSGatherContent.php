@@ -109,13 +109,17 @@ class SSGatherContent extends Object {
 
 
     /**
-     * Determine whether to overwrite existing CMS items by items from GatherContent,
-     * based on GatherContent unique item id
+     * Determine how to treat existing items (based on GatherContent unique item id) - overwrite or skip existing
+     * CMS items by items from GatherContent, or create new ones
+     *
+     * Value can be 'skip', 'update' or 'new', performing action as the constant suggests.
+     *
+     * If any other value is used, fallback is 'new'.
      *
      * @var bool
      * @config
      */
-    private static $update_existing;
+    private static $process_existing;
 
 
     /**
@@ -316,6 +320,12 @@ class SSGatherContent extends Object {
         // ensure translations are array
         if (!is_array($this->cfg->translations)) {
             throw new Exception('Translations have to be configured as an array of "value -> translated value" pairs.');
+        }
+
+
+        // check configuration of process_existing setting
+        if (!is_string($this->cfg->process_existing) || !in_array(strtolower($this->cfg->process_existing), array('new', 'skip', 'update'))) {
+            throw new Exception('Existing items processing mode (config key "process_existing") has to be set to one of these options: new, skip, update.');
         }
 
 
