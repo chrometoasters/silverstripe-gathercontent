@@ -645,6 +645,11 @@ class SSGatherContent extends Object {
                                 $item_parent_id = $single_item['parent_id'];
                                 $item_template_id = $single_item['template_id'];
 
+                                // helper not to iterate over already processed items
+                                if (!array_key_exists('SSGC_processed', $single_item)) {
+                                    $single_item['SSGC_processed'] = false;
+                                }
+
                                 // not the current template?
                                 if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
                                     continue;
@@ -654,12 +659,14 @@ class SSGatherContent extends Object {
                                 // skipped template?
                                 } elseif (in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
                                     continue;
+                                // already processed?
+                                } elseif ($single_item['SSGC_processed']) {
+                                    continue;
                                 }
 
                                 // have we got the item from a previously downloaded file
                                 if ($single_item['SSGC_source'] === 'file') {
                                     $item = $single_item;
-
                                 // or should the item be loaded from the API
                                 } else {        // previously if ($single_item['SSGC_source'] === 'api'), but we want to use API by default
                                     $item = $this->gcAPI->getItem($item_id);
@@ -1024,6 +1031,7 @@ class SSGatherContent extends Object {
 
                                                             $has_matching_property = true;
                                                         }
+
                                                         if (array_key_exists($item_section_element_field, $item_class_has_many)) {
                                                             // TODO check whether the item exists before linking, if not file
 
@@ -1085,6 +1093,7 @@ class SSGatherContent extends Object {
 
                                                             $has_matching_property = true;
                                                         }
+
                                                         if (array_key_exists($item_section_element_field, $item_class_many_many)) {
                                                             // TODO check whether the item exists before linking, if not file
 
@@ -1178,6 +1187,8 @@ class SSGatherContent extends Object {
                                     } else {
                                         $item_instance->write();
                                     }
+
+                                    $single_item['SSGC_processed'] = true;
 
                                 } // if ($item_spec)
 
