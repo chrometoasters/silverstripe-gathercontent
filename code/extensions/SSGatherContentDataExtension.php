@@ -88,7 +88,7 @@ class SSGatherContentDataExtension extends DataExtension {
 
 
     /**
-     * Store current or provided date as date when the item was created from GatherContent
+     * Store current or provided date as date when the item was created from GatherContent, if the date is not set already
      *
      * @param string|null $date     date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
      */
@@ -97,7 +97,9 @@ class SSGatherContentDataExtension extends DataExtension {
             $date = SS_Datetime::now();
         }
 
-        $this->owner->GC_DateCreated = $date;
+        if (!$this->owner->GC_DateCreated) {
+            $this->owner->GC_DateCreated = $date;
+        }
     }
 
 
