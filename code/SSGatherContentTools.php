@@ -274,7 +274,13 @@ class SSGatherContentTools extends Object {
     public static function joinPaths() {
         $paths = array();
 
-        foreach (func_get_args() as $arg) {
+        $args = func_get_args();
+
+        if ((count($args) === 1) && (is_array($args[0]))) {
+            $args = $args[0];
+        }
+
+        foreach ($args as $arg) {
             if ($arg !== '') {
                 $paths[] = $arg;
             }
