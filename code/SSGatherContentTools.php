@@ -430,4 +430,51 @@ class SSGatherContentTools extends Object {
     }
 
 
+    /**
+     * Get SOV (Size Of Variable) - memory used to hold the variable
+     *
+     * @param mixed $var                        variable to be examined
+     * @param boolean|true $humanReadable        whether to return human readable or integer representation
+     * @return int|string                       size in memory
+     */
+    public static function getSizeOfVariable($var, $humanReadable = true) {
+
+        function bytesToSize($bytes, $precision = 2)
+        {
+            $kilobyte = 1024;
+            $megabyte = $kilobyte * 1024;
+            $gigabyte = $megabyte * 1024;
+            $terabyte = $gigabyte * 1024;
+
+            if (($bytes >= 0) && ($bytes < $kilobyte)) {
+                return $bytes . ' B';
+
+            } elseif (($bytes >= $kilobyte) && ($bytes < $megabyte)) {
+                return round($bytes / $kilobyte, $precision) . ' KB';
+
+            } elseif (($bytes >= $megabyte) && ($bytes < $gigabyte)) {
+                return round($bytes / $megabyte, $precision) . ' MB';
+
+            } elseif (($bytes >= $gigabyte) && ($bytes < $terabyte)) {
+                return round($bytes / $gigabyte, $precision) . ' GB';
+
+            } elseif ($bytes >= $terabyte) {
+                return round($bytes / $terabyte, $precision) . ' TB';
+            } else {
+                return $bytes . ' B';
+            }
+        }
+
+        $start_memory = memory_get_usage();
+        $var = unserialize(serialize($var));
+        $usage = (memory_get_usage() - $start_memory - PHP_INT_SIZE * 8);
+
+        if ($humanReadable) {
+            return bytesToSize($usage);
+        }
+
+        return $usage;
+    }
+
+
 }
