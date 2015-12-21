@@ -474,6 +474,53 @@ class SSGatherContent extends Object {
 
 
     /**
+     * Get a list of all Items for particular Project
+     *
+     * This method merges previously saved files list, if config allows, with items list loaded from GatherContent
+     * for specified project based on its ID.
+     *
+     *
+     * @param int $project_id       project ID to load items for
+     * @return array                data
+     */
+    private function getItems($project_id) {
+
+        // if we use saved files
+        if ($this->cfg->use_saved_json_files) {
+            $itemsFromJSONFiles = SSGatherContentTools::loadDataFromJSONByPattern($this->cfg->assets_subfolder_json, "project_{$project_id}_item_*.json");
+
+            // transform to be indexed by item ID
+            $itemsFromJSONFiles = SSGatherContentTools::transformArray($itemsFromJSONFiles, 'id', null, false, function($key) { return 'id_' . $key; });
+
+            // add flag it was loaded from a file
+            array_walk($itemsFromJSONFiles, function(&$item, $key) { $item['SSGC_source'] = 'file'; });
+
+        } else {
+            $itemsFromJSONFiles = array();
+        }
+
+        // if we have some API data
+        $itemsFromAPI = $this->gcAPI->getItems($project_id);
+        if ($itemsFromAPI) {
+
+            // transform to be indexed by item ID
+            $itemsFromAPI = SSGatherContentTools::transformArray($itemsFromAPI, 'id', null, false, function($key) { return 'id_' . $key; });
+
+            // add flag it was loaded from the API
+            array_walk($itemsFromAPI, function(&$item, $key) { $item['SSGC_source'] = 'api'; });
+
+        } else {
+            $itemsFromAPI = array();
+        }
+
+        // get API items overwrite JSON data items
+        $items = array_merge($itemsFromJSONFiles, $itemsFromAPI);
+
+        return $items;
+    }
+
+
+    /**
      * Import all content and all files from GatherContent into the CMS based on the YAML configuration.
      *
      */
@@ -569,7 +616,7 @@ class SSGatherContent extends Object {
                     $templates_order_orig = $templates_order;
 
                     // items
-                    $items = $this->gcAPI->getItems($project_id);
+                    $items = $this->getItems($project_id);
                     if ($items) {
 
                         while (is_array($templates_order)) {
@@ -598,7 +645,14 @@ class SSGatherContent extends Object {
                                     continue;
                                 }
 
-                                $item = $this->gcAPI->getItem($item_id);
+                                // have we got the item from a previously downloaded file
+                                if ($single_item['SSGC_source'] === 'file') {
+                                    $item = $single_item;
+
+                                // or should the item be loaded from the API
+                                } else {        // previously if ($single_item['SSGC_source'] === 'api'), but we want to use API by default
+                                    $item = $this->gcAPI->getItem($item_id);
+                                }
 
                                 // get item status and check whether we don't skip items with that status
                                 $item_status_name = $item['status']['data']['name'];
