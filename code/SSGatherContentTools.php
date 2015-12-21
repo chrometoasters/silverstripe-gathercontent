@@ -431,6 +431,30 @@ class SSGatherContentTools extends Object {
 
 
     /**
+     * Compose full path from given assets folder/array of folders and filename
+     *
+     * @param string|array $path        folder or array of folder under assets
+     * @param string $filename          filename or pattern to be added to the end
+     * @return string                   full absolute path
+     */
+    public static function getComposedFullPath($path, $filename) {
+
+        // if we've got array of paths, join them together
+        if (is_array($path)) {
+            $path = SSGatherContentTools::joinPaths($path);
+        }
+
+        // get folder object
+        $folder = Folder::find_or_make($path);
+
+        // compose full path
+        $fullPath = SSGatherContentTools::joinPaths($folder->getFullPath(), $filename);
+
+        return $fullPath;
+    }
+
+
+    /**
      * Get SOV (Size Of Variable) - memory used to hold the variable
      *
      * @param mixed $var                        variable to be examined
