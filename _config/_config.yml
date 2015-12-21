@@ -36,6 +36,12 @@ SSGatherContent:
       - "SSGatherContentProcessor::removeZeroWidthSpaces"
 
   mappings:
+    default:
+      SiteTree:
+        fields:
+          super_mappings:
+            name: Title
+
     classes:
 
   statuses:
