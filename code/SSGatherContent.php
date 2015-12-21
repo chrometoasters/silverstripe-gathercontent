@@ -685,6 +685,28 @@ class SSGatherContent extends Object {
                                 if ($item_spec) {
                                     $item_spec_details = reset($item_spec);
                                     $item_class = key($item_spec);
+                                    $item_update = false;
+
+                                    // get existing item, if it exists
+                                    $item_instance = SSGatherContentTools::getItemByGCUniqueIdentifier($this->cfg->unique_identifier, $item_id, $item_class);
+
+                                    // if the item exists and we don't have to create a new one
+                                    if (($item_instance instanceof $item_class) && ($item_instance->exists()) && ($this->cfg->process_existing !== 'new')) {
+
+                                        // skip existing?
+                                        if ($this->cfg->process_existing === 'skip') {
+                                            continue;
+                                        }
+
+                                        // updating?
+                                        if ($this->cfg->process_existing === 'update') {
+                                            $item_update = true;
+                                        }
+
+                                    // item doesn't exist or force create new instance
+                                    } else {
+                                        $item_instance = new $item_class();
+                                    }
 
                                     // if configured, get class field & value processors
                                     $item_spec_details_processors = null;
@@ -737,9 +759,6 @@ class SSGatherContent extends Object {
                                     if (array_key_exists('skip', $item_spec_details_fields)) {
                                         $item_spec_details_fields_skip = $item_spec_details_fields['skip'];
                                     }
-
-                                    // create an instance of the class to assign data to
-                                    $item_instance = new $item_class();
 
                                     // get class field configuration from the CMS
                                     $item_class_db = $item_instance->db();
@@ -1009,8 +1028,19 @@ class SSGatherContent extends Object {
                                                                 foreach ($item_section_element_value as $item_section_element_value_item) {
                                                                     $has_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_has_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
                                                                     if ($has_many_item) {
-                                                                        $item_instance->$item_section_element_field()->add($has_many_item);
-                                                                        $has_set_value = true;
+
+                                                                        // updating?
+                                                                        if (!$item_update) {
+                                                                            // no -> safe to add to the list
+                                                                            $item_instance->$item_section_element_field()->add($has_many_item);
+                                                                            $has_set_value = true;
+                                                                        } else {
+                                                                            // add only if the item is in not already in the list
+                                                                            if (!$item_instance->$item_section_element_field(array($item_class_has_many[$item_section_element_field].'.ID' => $has_many_item->ID))->exists()) {
+                                                                                $item_instance->$item_section_element_field()->add($has_many_item);
+                                                                                $has_set_value = true;
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
 
@@ -1023,9 +1053,21 @@ class SSGatherContent extends Object {
                                                                 } else {
                                                                     if ($this->cfg->download_files) {
                                                                         $has_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
+
                                                                         if ($has_many_fileID) {
-                                                                            $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
-                                                                            $has_set_value = true;
+
+                                                                            // updating?
+                                                                            if (!$item_update) {
+                                                                                // no -> safe to add to the list
+                                                                                $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
+                                                                                $has_set_value = true;
+                                                                            } else {
+                                                                                // add only if the item is in not already in the list
+                                                                                if (!$item_instance->$item_section_element_field(array($item_class_has_many[$item_section_element_field].'.ID' => $has_many_fileID))->exists()) {
+                                                                                    $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
+                                                                                    $has_set_value = true;
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -1048,8 +1090,19 @@ class SSGatherContent extends Object {
                                                                 foreach ($item_section_element_value as $item_section_element_value_item) {
                                                                     $many_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_many_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
                                                                     if ($many_many_item) {
-                                                                        $item_instance->$item_section_element_field()->add($many_many_item);
-                                                                        $has_set_value = true;
+
+                                                                        // updating?
+                                                                        if (!$item_update) {
+                                                                            // no -> safe to add to the list
+                                                                            $item_instance->$item_section_element_field()->add($many_many_item);
+                                                                            $has_set_value = true;
+                                                                        } else {
+                                                                            // add only if the item is in not already in the list
+                                                                            if (!$item_instance->$item_section_element_field(array($item_class_many_many[$item_section_element_field].'.ID' => $many_many_item->ID))->exists()) {
+                                                                                $item_instance->$item_section_element_field()->add($many_many_item);
+                                                                                $has_set_value = true;
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
 
@@ -1062,8 +1115,19 @@ class SSGatherContent extends Object {
                                                                     if ($this->cfg->download_files) {
                                                                         $many_many_fileID = $this->downloadFileIntoAssetsSubfolder($item_section_element_value);
                                                                         if ($many_many_fileID) {
-                                                                            $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
-                                                                            $has_set_value = true;
+
+                                                                            // updating?
+                                                                            if (!$item_update) {
+                                                                                // no -> safe to add to the list
+                                                                                $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
+                                                                                $has_set_value = true;
+                                                                            } else {
+                                                                                // add only if the item is in not already in the list
+                                                                                if (!$item_instance->$item_section_element_field(array($item_class_many_many[$item_section_element_field].'.ID' => $many_many_fileID))->exists()) {
+                                                                                    $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
+                                                                                    $has_set_value = true;
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
