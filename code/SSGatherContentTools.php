@@ -455,6 +455,67 @@ class SSGatherContentTools extends Object {
 
 
     /**
+     * Load JSON data from a given file and decode it into an associative array
+     *
+     * If the .json file extension is not part of the filename, it will be added.
+     *
+     * @param string $filename              absolute path to the file with the filename
+     * @return array|null                   associative decoded array OR null
+     */
+    public static function loadDataFromJSON($filename) {
+
+        // read file if exits
+        if (file_exists($filename)) {
+            $json_encoded = file_get_contents($filename);
+
+            // decode associative array
+            if (!is_null($json_encoded)) {
+                return json_decode($json_encoded, true);
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Load JSON data from files based on a filename pattern, decode it and return in an associative array
+     * of associative arrays
+     *
+     * If the .json file extension is not part of the filename pattern, it will be added.
+     * This function uses glob() so not all pattern expressions are available, see the documentation.
+     *
+     * @param string $assetsSubfolder          assets subfolder within which we search for the files
+     * @param string $filenamePattern          filename pattern
+     * @return array                           array of loaded data
+     */
+    public static function loadDataFromJSONByPattern($assetsSubfolder, $filenamePattern) {
+
+        $output = [];
+
+        // add file extension to the pattern if missing
+        if (substr($filenamePattern, -5) !== '.json') {
+            $filenamePattern .= '.json';
+        }
+
+        // get files matching the pattern
+        $sourceFiles = glob(self::getComposedFullPath($assetsSubfolder, $filenamePattern));
+
+        // iterate over the files
+        foreach ($sourceFiles as $sourceFile) {
+
+            $jsonData = self::loadDataFromJSON($sourceFile);
+
+            if ($jsonData && is_array($jsonData)) {
+                $output[] = $jsonData;
+            }
+        }
+
+        return $output;
+    }
+
+
+    /**
      * Get SOV (Size Of Variable) - memory used to hold the variable
      *
      * @param mixed $var                        variable to be examined
