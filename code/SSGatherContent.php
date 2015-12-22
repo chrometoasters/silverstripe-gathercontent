@@ -1231,6 +1231,47 @@ class SSGatherContent extends Object {
 
                     } // if ($items)
 
+                    // have we processed some items?
+                    if (count($processed_items)) {
+
+                        // fix hierarchy for SiteTree descendants if we have the extension
+                        if (SiteTree::has_extension('SSGatherContentDataExtension')) {
+
+                            foreach ($processed_items as $processed_item_ID => $SSGC_data) {
+                                if (isset($SSGC_data['GC_ID']) && isset($SSGC_data['GC_ParentID'])) {
+
+                                    // get CMS item representing the GC item
+                                    $cms_item = SiteTree::get()->filter(array('GC_ID' => $SSGC_data['GC_ID']));
+
+                                    // check whether we have a descendant of SiteTree
+                                    if ($cms_item->exists()) {
+                                        $cms_item = $cms_item->first();
+
+                                        if ($cms_item->exists()) {
+
+                                            // get CMS item representing the GC item's parent
+                                            $parent_cms_item = SiteTree::get()->filter(array('GC_ID' => $SSGC_data['GC_ParentID']));
+
+                                            // link if both exist
+                                            if ($parent_cms_item->exists()) {
+                                                $parent_cms_item = $parent_cms_item->first();
+                                                if ($parent_cms_item->exists()) {
+
+                                                    $cms_item->ParentID = $parent_cms_item->ID;
+                                                    $cms_item->write();
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                } // if (isset($SSGC_data['GC_ID']) && isset($SSGC_data['GC_ParentID']))
+
+                            } // foreach ($processed_items as $processed_item_ID => $SSGC_data)
+
+                        } // if (SiteTree::has_extension('SSGatherContentDataExtension'))
+
+                    } // if (count($processed_items))
+
                 } // foreach ($projects)
 
             } // if ($projects)
