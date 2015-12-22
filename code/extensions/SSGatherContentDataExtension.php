@@ -71,9 +71,12 @@ class SSGatherContentDataExtension extends DataExtension {
      * Store GatherContent item's ID
      *
      * @param int|string $id        ID
+     * @return int|string           stored ID
      */
     public function GC_storeItemID($id) {
         $this->owner->GC_ID = $id;
+
+        return $id;
     }
 
 
@@ -81,9 +84,12 @@ class SSGatherContentDataExtension extends DataExtension {
      * Store GatherContent parent item's ID
      *
      * @param int|string $id        ID
+     * @return int|string           stored ID
      */
     public function GC_storeParentItemID($id) {
         $this->owner->GC_ParentID = $id;
+
+        return $id;
     }
 
 
@@ -91,6 +97,7 @@ class SSGatherContentDataExtension extends DataExtension {
      * Store current or provided date as date when the item was created from GatherContent, if the date is not set already
      *
      * @param string|null $date     date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
+     * @return false|SS_Datetime    stored date or false when not stored
      */
     public function GC_storeDateCreated($date = null) {
         if (!$date) {
@@ -99,7 +106,11 @@ class SSGatherContentDataExtension extends DataExtension {
 
         if (!$this->owner->GC_DateCreated) {
             $this->owner->GC_DateCreated = $date;
+
+            return $date;
         }
+
+        return false;
     }
 
 
@@ -108,6 +119,7 @@ class SSGatherContentDataExtension extends DataExtension {
      * Not likely to be used much as onBeforeWrite is used to save LastUpdated date
      *
      * @param string|null $date     date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
+     * @return SS_Datetime          stored date
      */
     public function GC_storeDateLastUpdated($date = null) {
         if (!$date) {
@@ -115,14 +127,17 @@ class SSGatherContentDataExtension extends DataExtension {
         }
 
         $this->owner->GC_DateLastUpdated = $date;
+
+        return $date;
     }
 
 
     /**
      * Add or rewrite log for the item
      *
-     * @param $log                  text to be added to the log or to replace the log (based on next param)
+     * @param string $log           text to be added to the log or to replace the log (based on next param)
      * @param bool|true $append     whether to append (true) to the log or rewrite (false) the log
+     * @return string               added/replaced log text
      */
     public function GC_storeLog($log, $append = true) {
         if ($append) {
@@ -130,6 +145,8 @@ class SSGatherContentDataExtension extends DataExtension {
         } else {
             $this->owner->GC_Log = $log;
         }
+
+        return $log;
     }
 
 
@@ -140,12 +157,17 @@ class SSGatherContentDataExtension extends DataExtension {
      * @param int|string|null $parentId         Parent ID
      * @param string|null $dateCreated          'created' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
      * @param string|null $dateLastUpdated      'last updated' date in acceptable format for SS_DateTime (NZ format or ISO 8601 formatted date and time [Y-m-d H:i:s])
+     * @return array                            stored data
      */
     public function GC_storeAllInfo($id, $parentId = null, $dateCreated = null, $dateLastUpdated = null) {
-        $this->owner->GC_storeItemID($id);
-        $this->owner->GC_storeParentItemID($parentId);
-        $this->owner->GC_storeDateCreated($dateCreated);
-        $this->owner->GC_storeDateLastUpdated($dateLastUpdated);
+        $output = array();
+
+        $output['GC_ID'] = $this->owner->GC_storeItemID($id);
+        $output['GC_ParentID'] = $this->owner->GC_storeParentItemID($parentId);
+        $output['GC_DateCreated'] = $this->owner->GC_storeDateCreated($dateCreated);
+        $output['GC_DateLastUpdated'] = $this->owner->GC_storeDateLastUpdated($dateLastUpdated);
+
+        return $output;
     }
 
 
