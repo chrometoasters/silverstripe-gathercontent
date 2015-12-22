@@ -625,6 +625,9 @@ class SSGatherContent extends Object {
 
                     $templates_order_orig = $templates_order;
 
+                    // holder for IDs of processed CMS items where we will check the hierarchy - new or updated items
+                    $processed_items = array();
+
                     // items
                     $items = $this->getItems($project_id);
                     if ($items) {
@@ -1188,7 +1191,11 @@ class SSGatherContent extends Object {
                                     }; // if is_array($item_content)
 
                                     if ($item_instance->hasExtension('SSGatherContentDataExtension')) {
-                                        $item_instance->GC_storeAllInfo($item_id, $item_parent_id);
+                                        $SSGC_data = $item_instance->GC_storeAllInfo($item_id, $item_parent_id);
+                                        unset($SSGC_data['GC_DateCreated']);
+                                        unset($SSGC_data['GC_DateLastUpdated']);
+                                    } else {
+                                        $SSGC_data = array();
                                     }
 
                                     if ($item_instance instanceof SiteTree) {
@@ -1210,7 +1217,11 @@ class SSGatherContent extends Object {
                                         $item_instance->write();
                                     }
 
+                                    // set as processed
                                     $single_item['SSGC_processed'] = true;
+
+                                    // store the item details for hierarchy fix
+                                    $processed_items[$item_instance->ID] = $SSGC_data;
 
                                 } // if ($item_spec)
 
