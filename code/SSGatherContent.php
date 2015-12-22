@@ -644,8 +644,6 @@ class SSGatherContent extends Object {
 
                             // iterate over items
                             foreach ($items as $single_item) {
-                                $item_id = $single_item['id'];
-                                $item_parent_id = $single_item['parent_id'];
 
                                 $item_template_id = null;
                                 if (array_key_exists('template_id', $single_item)) {
@@ -670,6 +668,9 @@ class SSGatherContent extends Object {
                                 } elseif ($single_item['SSGC_processed']) {
                                     continue;
                                 }
+
+                                $item_id = $single_item['id'];
+                                $item_parent_id = $single_item['parent_id'];
 
                                 // have we got the item from a previously downloaded file
                                 if ($single_item['SSGC_source'] === 'file') {
