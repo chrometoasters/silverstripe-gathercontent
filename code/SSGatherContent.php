@@ -643,7 +643,11 @@ class SSGatherContent extends Object {
                             foreach ($items as $single_item) {
                                 $item_id = $single_item['id'];
                                 $item_parent_id = $single_item['parent_id'];
-                                $item_template_id = $single_item['template_id'];
+
+                                $item_template_id = null;
+                                if (array_key_exists('template_id', $single_item)) {
+                                    $item_template_id = $single_item['template_id'];
+                                }
 
                                 // helper not to iterate over already processed items
                                 if (!array_key_exists('SSGC_processed', $single_item)) {
@@ -651,13 +655,13 @@ class SSGatherContent extends Object {
                                 }
 
                                 // not the current template?
-                                if ($template_limit && ($templates_IdToName[$item_template_id] !== $template_limit)) {
+                                if ($template_limit && $item_template_id && ($templates_IdToName[$item_template_id] !== $template_limit)) {
                                     continue;
                                 // already processed template?
-                                } elseif (($template_limit === null) && count($templates_order_orig) && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
+                                } elseif (($template_limit === null) && count($templates_order_orig) && $item_template_id && (in_array($templates_IdToName[$item_template_id], $templates_order_orig))) {
                                     continue;
                                 // skipped template?
-                                } elseif (count($skipped_templates) && in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
+                                } elseif (count($skipped_templates) && $item_template_id && in_array($templates_IdToName[$item_template_id], $skipped_templates)) {
                                     continue;
                                 // already processed?
                                 } elseif ($single_item['SSGC_processed']) {
@@ -677,11 +681,14 @@ class SSGatherContent extends Object {
                                 if (in_array($item_status_name, $this->cfg->statuses['skip'])) continue;
 
                                 // get template name
-                                $item_template_name = $templates_IdToName[$item['template_id']];
+                                $item_template_name = null;
+                                if (array_key_exists('template_id', $item) && $item['template_id']) {
+                                    $item_template_name = $templates_IdToName[$item['template_id']];
+                                }
 
                                 // item specification from config
                                 $item_spec = null;
-                                if (array_key_exists($item_template_name, $template_to_class)) {
+                                if ($item_template_name && array_key_exists($item_template_name, $template_to_class)) {
                                     $item_spec = $template_to_class[$item_template_name];
                                 } else {
                                     if ($mappings_default) {
