@@ -1191,7 +1191,7 @@ class SSGatherContent extends Object {
 
                                     }; // if is_array($item_content)
 
-                                    if ($item_instance->hasExtension('SSGatherContentDataExtension')) {
+                                    if (is_callable(array($item_instance, 'GC_storeAllInfo'))) {
                                         $SSGC_data = $item_instance->GC_storeAllInfo($item_id, $item_parent_id);
                                         unset($SSGC_data['GC_DateCreated']);
                                         unset($SSGC_data['GC_DateLastUpdated']);
@@ -1222,7 +1222,7 @@ class SSGatherContent extends Object {
                                     $single_item['SSGC_processed'] = true;
 
                                     // store the item details for hierarchy fix
-                                    $processed_items[$item_instance->ID] = $SSGC_data;
+                                    $processed_items[] = $SSGC_data;
 
                                 } // if ($item_spec)
 
@@ -1238,7 +1238,7 @@ class SSGatherContent extends Object {
                         // fix hierarchy for SiteTree descendants if we have the extension
                         if (SiteTree::has_extension('SSGatherContentDataExtension')) {
 
-                            foreach ($processed_items as $processed_item_ID => $SSGC_data) {
+                            foreach ($processed_items as $SSGC_data) {
                                 if (isset($SSGC_data['GC_ID']) && isset($SSGC_data['GC_ParentID'])) {
 
                                     // get CMS item representing the GC item
