@@ -102,6 +102,13 @@ class SSGatherContentProcessor extends Object {
             $value = array();
         }
 
+        // remove empty items
+        foreach ($value as $i => $v) {
+            if (!SSGatherContentProcessor::trimString($v)) {
+                unset($value[$i]);
+            }
+        }
+
         return $value;
     }
 
