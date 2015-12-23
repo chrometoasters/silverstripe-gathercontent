@@ -1211,7 +1211,7 @@ class SSGatherContent extends Object {
 
                                         $item_instance->write();
 
-                                        if ($this->cfg->allow_publish) {
+                                        if ($this->cfg->allow_publish && (in_array($item_status_name, $this->cfg->statuses['publish']))) {
                                             $item_instance->doRestoreToStage();
                                             $item_instance->publish('Stage', 'Live');
                                         }
