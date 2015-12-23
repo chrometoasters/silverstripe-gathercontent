@@ -1079,8 +1079,10 @@ class SSGatherContent extends Object {
                                                                             $item_instance->$item_section_element_field()->add($has_many_item);
                                                                             $has_set_value = true;
                                                                         } else {
+                                                                            // get the correct table name
+                                                                            $table_name = $item_class_has_many[$item_section_element_field];
                                                                             // add only if the item is in not already in the list
-                                                                            if (!$item_instance->$item_section_element_field(array($item_class_has_many[$item_section_element_field].'.ID' => $has_many_item->ID))->exists()) {
+                                                                            if (!$item_instance->$item_section_element_field(array($table_name.'.ID' => $has_many_item->ID))->exists()) {
                                                                                 $item_instance->$item_section_element_field()->add($has_many_item);
                                                                                 $has_set_value = true;
                                                                             }
@@ -1106,8 +1108,10 @@ class SSGatherContent extends Object {
                                                                                 $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
                                                                                 $has_set_value = true;
                                                                             } else {
+                                                                                // get the correct table name
+                                                                                $table_name = $item_class_has_many[$item_section_element_field];
                                                                                 // add only if the item is in not already in the list
-                                                                                if (!$item_instance->$item_section_element_field(array($item_class_has_many[$item_section_element_field].'.ID' => $has_many_fileID))->exists()) {
+                                                                                if (!$item_instance->$item_section_element_field(array($table_name.'.ID' => $has_many_fileID))->exists()) {
                                                                                     $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_has_many[$item_section_element_field], $has_many_fileID));
                                                                                     $has_set_value = true;
                                                                                 }
@@ -1142,8 +1146,10 @@ class SSGatherContent extends Object {
                                                                             $item_instance->$item_section_element_field()->add($many_many_item);
                                                                             $has_set_value = true;
                                                                         } else {
+                                                                            // get the correct table name
+                                                                            $table_name = $item_class_many_many[$item_section_element_field];
                                                                             // add only if the item is in not already in the list
-                                                                            if (!$item_instance->$item_section_element_field(array($item_class_many_many[$item_section_element_field].'.ID' => $many_many_item->ID))->exists()) {
+                                                                            if (!$item_instance->$item_section_element_field(array($table_name.'.ID' => $many_many_item->ID))->exists()) {
                                                                                 $item_instance->$item_section_element_field()->add($many_many_item);
                                                                                 $has_set_value = true;
                                                                             }
@@ -1167,8 +1173,10 @@ class SSGatherContent extends Object {
                                                                                 $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
                                                                                 $has_set_value = true;
                                                                             } else {
+                                                                                // get the correct table name
+                                                                                $table_name = $item_class_many_many[$item_section_element_field];
                                                                                 // add only if the item is in not already in the list
-                                                                                if (!$item_instance->$item_section_element_field(array($item_class_many_many[$item_section_element_field].'.ID' => $many_many_fileID))->exists()) {
+                                                                                if (!$item_instance->$item_section_element_field()->filter(array($table_name.'.ID' => $many_many_fileID))->exists()) {
                                                                                     $item_instance->$item_section_element_field()->add(File::get_by_id($item_class_many_many[$item_section_element_field], $many_many_fileID));
                                                                                     $has_set_value = true;
                                                                                 }
