@@ -426,8 +426,8 @@ class SSGatherContentTools extends Object {
                     $item->write();
 
                     if ($publishCreated) {
-                        $item->publish('Stage', 'Live');
                         $item->doRestoreToStage();
+                        $item->publish('Stage', 'Live');
                     }
 
                 } else {

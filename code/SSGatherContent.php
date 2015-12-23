@@ -1210,9 +1210,10 @@ class SSGatherContent extends Object {
                                         }
 
                                         $item_instance->write();
+
                                         if ($this->cfg->allow_publish) {
-                                            $item_instance->publish('Stage', 'Live');
                                             $item_instance->doRestoreToStage();
+                                            $item_instance->publish('Stage', 'Live');
                                         }
                                     } else {
                                         $item_instance->write();
@@ -1260,6 +1261,10 @@ class SSGatherContent extends Object {
 
                                                     $cms_item->ParentID = $parent_cms_item->ID;
                                                     $cms_item->write();
+                                                    if ($cms_item->isPublished()) {
+                                                        $cms_item->doRestoreToStage();
+                                                        $cms_item->publish('Stage', 'Live');
+                                                    }
                                                 }
                                             }
                                         }
