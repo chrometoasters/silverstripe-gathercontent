@@ -520,7 +520,7 @@ class SSGatherContentTools extends Object {
      */
     public static function loadDataFromJSONByPattern($assetsSubfolder, $filenamePattern) {
 
-        $output = [];
+        $output = array();
 
         // add file extension to the pattern if missing
         if (substr($filenamePattern, -5) !== '.json') {
