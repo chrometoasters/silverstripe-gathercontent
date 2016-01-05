@@ -87,17 +87,23 @@ class SSGatherContentProcessor extends Object {
      * If provided value is string, split it into an array using new line as a delimiter
      *
      * Passed in but accessed via func_get_args()
-     * param $value
+     * param $value                 value to be split
+     * param $delimiter             optional delimiter, defaults to new line
      *
      * @return array                array of rows or original value
      */
     public static function linesToArray() {
         $args = func_get_args();
         $value = $args[0];
+        if (isset($args[1])) {
+            $delimiter = $args[1];
+        } else {
+            $delimiter = "\n";
+        }
 
         // only explode non-zero-length strings
         if (SSGatherContentProcessor::trimString($value)) {
-            $value = explode("\n", $value);
+            $value = explode($delimiter, $value);
         } else {
             $value = array();
         }
