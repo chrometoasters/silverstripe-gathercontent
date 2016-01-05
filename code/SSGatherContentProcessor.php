@@ -133,7 +133,7 @@ class SSGatherContentProcessor extends Object {
 
         // only if we've got an array with some values
         if (is_array($value) && count($value)) {
-            $value = $value[0];
+            return reset($value);
         }
 
         return $value;
