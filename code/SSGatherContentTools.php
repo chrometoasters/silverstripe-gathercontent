@@ -409,6 +409,8 @@ class SSGatherContentTools extends Object {
      */
     public static function getItemByLookupField($field, $value, $class = 'SiteTree', $create = false, $publishCreated = false) {
 
+        if (empty($field) || empty($value) || empty($class)) return false;
+
         $item = $class::get()->filter(array($field => $value));
 
         // if the item exists
