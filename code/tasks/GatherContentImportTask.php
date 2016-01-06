@@ -13,7 +13,7 @@ class GatherContentImportTask extends BuildTask {
     }
 
     function run($request) {
-        echo '<br>start time: ' . date('d/m/Y H:i:s') . '<br>' . PHP_EOL;
+        echo '<pre><br>start time: ' . date('d/m/Y H:i:s') . '<br>' . PHP_EOL;
 
         $this->gc->loadContentFromGatherContent();
 
