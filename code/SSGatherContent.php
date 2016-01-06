@@ -1033,7 +1033,7 @@ class SSGatherContent extends Object {
                                                             if ($item_section_element_type !== 'files') {
                                                                 $has_one_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value, $item_class_has_one[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
 
-                                                                if ($has_one_item) {
+                                                                if ($has_one_item && !empty($has_one_item)) {
                                                                     $item_instance->{$item_section_element_field . 'ID'} = $has_one_item->ID;
                                                                     $has_set_value = true;
                                                                 }
@@ -1071,7 +1071,7 @@ class SSGatherContent extends Object {
                                                                 }
                                                                 foreach ($item_section_element_value as $item_section_element_value_item) {
                                                                     $has_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_has_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
-                                                                    if ($has_many_item) {
+                                                                    if ($has_many_item && !empty($has_many_item)) {
 
                                                                         // updating?
                                                                         if (!$item_update) {
@@ -1137,8 +1137,9 @@ class SSGatherContent extends Object {
                                                                 }
 
                                                                 foreach ($item_section_element_value as $item_section_element_value_item) {
+                                                                   
                                                                     $many_many_item = SSGatherContentTools::getItemByLookupField($item_spec_details_field_mappings_lookup_field, $item_section_element_value_item, $item_class_many_many[$item_section_element_field], $item_spec_details_field_mappings_lookup_create);
-                                                                    if ($many_many_item) {
+                                                                    if ($many_many_item && !empty($many_many_item)) {
 
                                                                         // updating?
                                                                         if (!$item_update) {
