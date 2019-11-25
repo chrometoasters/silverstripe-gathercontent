@@ -10,7 +10,7 @@
  * is passed in as the first parameter.
  *
  */
-class SSGatherContentProcessor extends Object {
+class SSGatherContentProcessor extends SS_Object {
 
     /**
      * Remove given prefix from string

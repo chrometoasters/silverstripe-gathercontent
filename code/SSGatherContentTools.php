@@ -6,7 +6,7 @@
  * Class holding various module tools like curl wrappers etc. to keep things at least a little bit separated
  *
  */
-class SSGatherContentTools extends Object {
+class SSGatherContentTools extends SS_Object {
 
 
     /**

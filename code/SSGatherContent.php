@@ -6,7 +6,7 @@
  * Main silverstripe-gathercontent module class where all the important magic is happening :-)
  *
  */
-class SSGatherContent extends Object {
+class SSGatherContent extends SS_Object {
 
     /**
      * GatherContent API details
